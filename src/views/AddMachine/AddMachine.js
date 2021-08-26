@@ -75,7 +75,8 @@ const AddMachine = props => {
   const [failed, setFailed] = useState(false)
 
   const [amount, setAmount] = useState(30)
-  const [approvestatus, setApprovestatus] = useState(false)
+
+  const [approvestatus, setApprovestatus] = useState('')
   const [transactionStatus, setTransactionStatus] = useState('') // '' 、confirm 、pengding 、success 、fails  
 
   const [poolCode, setPoolCode] = useState('p12345678')
@@ -129,7 +130,7 @@ const AddMachine = props => {
     get_allowance()
       .then(
         allowance => {
-          allowance != '0' && setApprovestatus(true)
+          allowance != '0' && setApprovestatus('success')
         }
       )
   }
@@ -156,8 +157,14 @@ const AddMachine = props => {
     if (transactionStatus == 'failed') setFailed(true)
   }, [transactionStatus])
 
+
+  // useEffect(() => {
+  //   if (approveStatus == 'success') setApproveSuccess(true)
+  //   if (approveStatus == 'failed') setApproveFailed(true)
+  // }, [approveStatus])
+
   const approve = async () => {
-    approval()
+    approval({ setApprovestatus })
   }
 
   const addMachine = async () => {
@@ -165,7 +172,7 @@ const AddMachine = props => {
     try {
       const web3 = await connectWallet()
       let amount_wei = web3.utils.toWei((amount * 100).toString(), 'mwei')
-      console.log('amount_wei:', amount_wei)
+      // console.log('amount_wei:', amount_wei)
       const tx = await add_machine({ cycle, minerNo, orderId, devId: tmpdevId, poolCode, amount: amount_wei, pledgePower, setTransactionStatus })
     
     } catch (e) {
@@ -289,16 +296,18 @@ const AddMachine = props => {
 
           <Grid item container xs={12} className='addmachineButton'>
             {
-              approvestatus ?
+              approvestatus=='success' ?
                 (transactionStatus == 'confirm') && <Button variant="contained" type="submit" size="large"> Waiting Confirm... </Button>
                 || (transactionStatus == 'pending') && <Button variant="contained" type="submit" size="large"> Pending... </Button>
                 || (transactionStatus == '') && <Button variant="contained" type="submit" color="primary" size="large" onClick={addMachine}>
-                  Staking Now
-                </Button>
+                      Staking Now
+                    </Button>
                 || ''
-                : <Button variant="contained" type="submit" size="large" onClick={approve} >
-                  {approvestatus ? 'Has Approved' : 'Approve'}
-                </Button>
+                : (approvestatus=='confirm') &&  <Button variant="contained" type="submit" size="large"> Waiting Confirm... </Button> 
+                || (approvestatus=='pending') &&  <Button variant="contained" type="submit" size="large"> pending... </Button> 
+                || <Button variant="contained" type="submit" size="large" onClick={approve} >
+                    { approvestatus ? 'Has Approved' : 'Approve' }
+                  </Button>
             }
           </Grid>
         </Grid>

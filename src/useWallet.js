@@ -123,7 +123,6 @@ export const useWallet = () => {
 
     const add_machine = ({ minerNo, orderId, devId, poolCode, amount, pledgePower, cycle, setTransactionStatus }) => {
         return new Promise(async (resolve, reject) => {
-            // console.log({ minerNo, orderId, devId, poolCode, amount, pledgePower, cycle })
             try {
                 const my_contract = await get_contract()
                 const add = my_contract.methods.add(
@@ -150,14 +149,7 @@ export const useWallet = () => {
                 }).on('error', error => {
                     setTransactionStatus('failed')
                     console.log('tx is failed ......', error)
-                })
-
-                // console.log('tx::', tx)
-                // tx.on('transactionHash', function (hash) {
-                //     // let list = [...txStatus]
-                //     // list.push({ txhash: hash, status: 'pending' })
-                //     // setTxStatus(list)
-                // })
+                }) 
 
                 resolve(tx)
             } catch (e) {
@@ -167,12 +159,33 @@ export const useWallet = () => {
         })
     }
 
-    const approval = async () => {
-        const adam_contract = await adam_token()
-        const approve = await adam_contract.methods.approve(miner_address, '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff')
-        const res = approve.send({ from: account })
+    const approval = async ({ setApprovestatus }) => {
+        return new Promise(async (resolve, reject) => {
+            try {
 
-        console.log(res)
+                const adam_contract = await adam_token()
+                const approve = await adam_contract.methods.approve(miner_address, '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff')
+                
+                setApprovestatus('confirm')
+                const tx = approve.send({ from: account })
+
+                tx.on('transactionHash', function (hash) {
+                    setApprovestatus('pending')
+                   
+                }).on('receipt', function (receipt) {
+                    setApprovestatus('success')
+
+                }).on('error', error => {
+                    setApprovestatus('failed')
+                    console.log('tx is failed ......', error)
+                }) 
+
+                resolve(tx)
+            } catch (e) {
+                reject(e)
+                console.error(e)
+            }
+        })
     }
 
     const adam_token = async () => {
