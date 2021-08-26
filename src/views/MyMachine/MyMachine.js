@@ -90,14 +90,16 @@ const useStyles = makeStyles(() => ({
 
 const AddIcon = props => <img src='/assets/add.png' style={{ width: '1rem', height: '1rem' }} />
 const MachineIcon = props => <img src='/assets/machine.png' />
+const RefreshIcon = props => <img src='/assets/refresh.png' />
 const NoDataIcon = props => <img src='/assets/nodata.png' style={{width: '50%'}} />
 const pageSize = '30'
 
 const Index = ({ themeMode }) => {
-  const [machinelist, setMachineList] = useState([]);
+  const [machinelist, setMachineList] = useState();
   const [pledgeInfo, setPledgeInfo] = useState(null)
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPage, setTotalPage] = useState(0)
+  const [loading, setLoading] = useState(false)
 
   const classes = useStyles();
   const history = useHistory();
@@ -138,9 +140,9 @@ const Index = ({ themeMode }) => {
     const { rows, count } = res
     let tmp = []
     if (currentPage == 1) {
+      setLoading(true)
       tmp = rows
     } else {
-      // tmp = machinelist.concat(rows)
       tmp = [...machinelist, ...rows]
     }  
     tmp = tmp.map(m => {
@@ -160,6 +162,7 @@ const Index = ({ themeMode }) => {
 
     setMachineList(list)
     setTotalPage(totalPage)
+    setLoading(false)
   }
 
   // 质押信息
@@ -187,21 +190,19 @@ const Index = ({ themeMode }) => {
     value: '232.3421',
     unit_desc: ''
   }, {
-    title: 'Estimated rate of return',
+    title: 'Estimated rate',
     value: '400%',
     className: 'redfont',
     unit_desc: ''
   }]
 
   const handleScroll = event => {
-
-
     let client_height = document.documentElement.clientHeight; //视口的高度
     let scroll_height = document.documentElement.scrollHeight; //文档的高度
     let scroll_top = document.documentElement.scrollTop || document.body.scrollTop;
 
-    console.log('client_height:', client_height, 'scroll_height:', scroll_height, 'scroll_top:', scroll_top)
-
+    // console.log('client_height:', client_height, 'scroll_height:', scroll_height, 'scroll_top:', scroll_top)
+    
     // 滚动的高度
     const scrollTop = (event.srcElement ? event.srcElement.documentElement.scrollTop : false) || window.pageYOffset || (event.srcElement ? event.srcElement.body.scrollTop : 0);
     var viewportSize = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
@@ -213,21 +214,10 @@ const Index = ({ themeMode }) => {
     const bottom_h = 60
     const rows_h = row_height * parseInt(pageSize) * currentPage
     const scroll_h = top_h + bottom_h + rows_h - viewportSize
-
-    console.log('scroll_h:', scroll_h)
-    console.log('rows_h:', rows_h)
-    
+ 
     if(scrollTop > scroll_h) {
       setCurrentPage(currentPage + 1)
     }
-    // if (totalPage == 1) {
-    //   return 10
-    // } else {
-    //   return 10 
-    // }
-    // if (scrollTop > viewportSize - offset_height + row_height * parseInt(pageSize)) {
-    //   setCurrentPage(currentPage + 1)
-    // }
 
     console.log('viewportSize::', viewportSize)
     console.log('scrollTop::', scrollTop)
@@ -246,13 +236,17 @@ const Index = ({ themeMode }) => {
   }, [])
 
   useEffect(() => {
+    
     getMachineList()
+    
   }, [currentPage])
 
-
   useEffect(()=> {
+    
     setCurrentPage(1)
     getMachineList()
+
+    
   }, [account])
 
   const MyCardContent = ({ title, value, unit_desc, class_name }) => {
@@ -349,19 +343,29 @@ const Index = ({ themeMode }) => {
         </div>
       </div>
       {
-        machinelist.map((item, idx) => {
-          return <AdamCard key={idx} item={item} />
-        })
-        
+        // machinelist.map((item, idx) => {
+        //   return <AdamCard key={idx} item={item} />
+        // }) 
       }
+      
       {
-        machinelist.length == 0 && currentPage == 1 && <div style={{
+        loading == true ? <div className='loading' style={{
           width: '100%',
           marginTop: '100px',
           display: 'flex',
           'justify-content': 'center',
           'align-items': 'center'
-        }}><NoDataIcon  /></div>
+        }}><RefreshIcon /> </div> 
+        : machinelist&&machinelist.length == 0 && currentPage == 1 ? <div style={{
+          width: '100%',
+          marginTop: '100px',
+          display: 'flex',
+          'justify-content': 'center',
+          'align-items': 'center'
+        }}><NoDataIcon  /></div> 
+        : machinelist&&machinelist.map((item, idx) => {
+          return <AdamCard key={idx} item={item} />
+        })
       }
     </div>
   );

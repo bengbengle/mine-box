@@ -268,7 +268,7 @@ const Index = ({ themeMode }) => {
         }}>
           <Title text="329.8347（ADAM）" className={classes.chartTitle} />
           <Palette scheme={chart_scheme} />
-          <PieSeries innerRadius={0.7} outerRadius={1} valueField="val" argumentField="category" />
+          <PieSeries innerRadius={0.6} outerRadius={0.9} valueField="val" argumentField="category" />
           <EventTracker onClick={clickTooltip} />
           {/* <Tooltip
             targetItem={tips}

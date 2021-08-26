@@ -249,7 +249,7 @@ const Index = () => {
         <Chart data={chart_data} className={classes.mychart}>
           <Title text="30.2 P" />
           <Palette scheme={colors} />
-          <PieSeries innerRadius={0.7} outerRadius={1} valueField="val" argumentField="category" />
+          <PieSeries innerRadius={0.6} outerRadius={0.9} valueField="val" argumentField="category" />
           <Legend position="bottom" rootComponent={Root} itemComponent={Item} labelComponent={Label} />
         </Chart>
       </Card>

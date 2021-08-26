@@ -7,7 +7,6 @@ import { useWallet } from '../../useWallet'
 import { request as req } from '../../req'
 import SuccessModal from './SuccessModal'
 import FailedModal from './FailedModal'
-
 import clsx from 'clsx';
 
 const useStyles = makeStyles(theme => ({
@@ -64,7 +63,7 @@ const HelpIcon = () => <img src='/assets/help.png' style={{ marginLeft: '10px', 
 
 const AddMachine = props => {
   const classes = useStyles();
-  const { add_machine, approval, get_allowance } = useWallet()
+  const { add_machine, approval, get_allowance, connectWallet } = useWallet()
 
   const [active, setActive] = useState(0)
   const [totalPower, setTotalPower] = useState(0)
@@ -160,13 +159,17 @@ const AddMachine = props => {
   const approve = async () => {
     approval()
   }
+
   const addMachine = async () => {
     const cycle = active == 0 ? 360 : active == 1 ? 540 : 1080
     try {
-      
-      const tx = await add_machine({ cycle, minerNo, orderId, devId: tmpdevId, poolCode, amount, pledgePower, setTransactionStatus })
+      const web3 = await connectWallet()
+      let amount_wei = web3.utils.toWei((amount * 100).toString(), 'mwei')
+      console.log('amount_wei:', amount_wei)
+      const tx = await add_machine({ cycle, minerNo, orderId, devId: tmpdevId, poolCode, amount: amount_wei, pledgePower, setTransactionStatus })
     
     } catch (e) {
+
       setTransactionStatus('fails')
       console.log(e)
     }
@@ -290,8 +293,8 @@ const AddMachine = props => {
                 (transactionStatus == 'confirm') && <Button variant="contained" type="submit" size="large"> Waiting Confirm... </Button>
                 || (transactionStatus == 'pending') && <Button variant="contained" type="submit" size="large"> Pending... </Button>
                 || (transactionStatus == '') && <Button variant="contained" type="submit" color="primary" size="large" onClick={addMachine}>
-                      Staking Now
-                    </Button>
+                  Staking Now
+                </Button>
                 || ''
                 : <Button variant="contained" type="submit" size="large" onClick={approve} >
                   {approvestatus ? 'Has Approved' : 'Approve'}

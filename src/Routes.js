@@ -29,56 +29,59 @@ import { useWallet } from './useWallet'
 const OKEX_NETWORK_ID = 65
 const Index = ({ themeMode, tabIndex, ...rest }) => {
 
-  const [ showModal, setShowModal ] = useState(false)
+  const [showModal, setShowModal] = useState(false)
+  const [loadingend, setLoadingend] = useState(false)
   const [networkID, setnetworkID] = useState(OKEX_NETWORK_ID)
-  const [ poolName, setPoolName ] = useState(false)
-  const { get_pool_name, set_pool_name, connect, account } = useWallet()
+  const [poolName, setPoolName] = useState(null)
+  const { get_pool_name, connect } = useWallet()
 
-  const getnetwork = async () => {
+  const initweb3 = async () => {
     try {
       var web3 = await connect()
       web3.currentProvider.on('networkChanged', function (network) {
-        console.log('network .. changed ...', network)
         setnetworkID(network)
       })
-      web3.currentProvider.on('accountsChanged', function (network) {
-        console.log('accounts_changed')
+      web3.currentProvider.on('accountsChanged', function (account) {
+        console.log('accounts_changed:', account)
       })
-      let id = await web3.shh.net.getId() 
+      let id = await web3.shh.net.getId()
       setnetworkID(id)
-      if(id == OKEX_NETWORK_ID) {
+      console.log('id:' + id, 'okexid:' + OKEX_NETWORK_ID)
+      if (id == OKEX_NETWORK_ID) {
         getpoolname()
       }
     } catch (e) {
-      setShowModal(true)
+      console.log('error:', e)
+      setShowModal(false)
     }
   }
 
   const getpoolname = async () => {
+    setLoadingend(false)
     let name = await get_pool_name()
-    console.log('poolname:', name)
     setPoolName(name)
+    console.log('poolname:', name)
+    setLoadingend(true)
   }
 
   useEffect(() => {
-    getnetwork()
+    initweb3()
   }, [])
 
   useEffect(() => {
-    console.log('networkID', networkID)
-
-    if(networkID == OKEX_NETWORK_ID) {
-      // getpoolname()
+    if (networkID == OKEX_NETWORK_ID) {
+      getpoolname()
     }
   }, [networkID])
 
   useEffect(() => {
-      if(networkID == OKEX_NETWORK_ID && !poolName ) {
-        setShowModal(true)
-      } else {
-        setShowModal(false)
-      }
-  }, [poolName])
+    if (networkID == OKEX_NETWORK_ID && loadingend && !poolName ) {
+      setShowModal(true)
+    } else {
+      setShowModal(false)
+    }
+  }, [poolName, loadingend])
+
   return (
     <>
       {
@@ -89,7 +92,7 @@ const Index = ({ themeMode, tabIndex, ...rest }) => {
             <MyEarnings themeMode={themeMode} tabIndex={tabIndex} {...rest} />
       }
       <div className='networkTips' style={{ display: networkID != 65 ? 'block' : 'none' }}>
-        <Collapse in={networkID != 65} style={{width: '100%'}} >
+        <Collapse in={networkID != 65} style={{ width: '100%' }} >
           <Alert severity="error"
             action={
               <IconButton
@@ -100,13 +103,13 @@ const Index = ({ themeMode, tabIndex, ...rest }) => {
               </IconButton>
             }
           >
-            Network Fault, Please change Network 
+            Network Fault, Please change Network
           </Alert>
         </Collapse>
       </div>
-      <ProfileModal show={showModal} 
-        handleCloseModal={() => setShowModal(false)} 
-        />
+      <ProfileModal show={showModal}
+        handleCloseModal={() => setShowModal(false)}
+      />
     </>
   )
 }

@@ -13,7 +13,7 @@ import { useWallet } from '../useWallet'
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
-  
+
 
 const useStyles = makeStyles(theme => ({
     form: {
@@ -40,33 +40,32 @@ const useStyles = makeStyles(theme => ({
 
 export default function Index({ show, handleCloseModal }) {
     const classes = useStyles()
-    const [poolName, setPoolName ] = useState()
+    const [poolName, setPoolName] = useState()
     const [transactionStatus, setTransactionStatus] = useState('') // '' 、confirm 、pengding 、success 、fails  
 
-    const { get_pool_name, set_pool_name } = useWallet()
+    const { set_pool_name } = useWallet()
 
     const handlePoolName = async e => {
-        console.log('handlePoolName:', 'handlePoolName')
         setTransactionStatus('confirm')
-        try{
+        try {
             const tx = await set_pool_name(poolName)
             console.log(tx)
             setTransactionStatus('success')
-        } catch(e) {
+        } catch (e) {
             setTransactionStatus('failed')
         }
     }
 
     useEffect(() => {
-        if(transactionStatus == 'success') {
+        if (transactionStatus == 'success') {
             setTransactionStatus('')
             handleCloseModal(false)
-        } 
-        if(transactionStatus == 'failed') {
+        }
+        if (transactionStatus == 'failed') {
             setTransactionStatus('')
-        } 
-      }, [transactionStatus])
-    
+        }
+    }, [transactionStatus])
+
     return (
         <div className={classes.form}>
             <Dialog
@@ -94,26 +93,16 @@ export default function Index({ show, handleCloseModal }) {
                         fullWidth
                         variant="outlined"
                     />
-                    <DialogContentText  >
+                    <DialogContentText>
                         Once the pool name is set, you will not be able to edit.
                     </DialogContentText>
-                    <DialogActions style={{width: '100%', marginTop: '30px'}}>
-                        {/* <Button
-                            onClick={handlePoolName}
-                            fullWidth
-                            variant="contained"
-                            type="submit"
-                            color="primary"
-                            size="large"
-                        >
-                            Commit
-                        </Button> */}
-{
-    (transactionStatus == 'confirm') && <Button fullWidth variant="contained" type="submit" size="large"> Waiting Confirm... </Button>
-    || (transactionStatus == 'pending') && <Button fullWidth variant="contained" type="submit" size="large"> Pending... </Button>
-    || (transactionStatus == '') && <Button fullWidth variant="contained" type="submit" color="primary" size="large" onClick={handlePoolName}>Submit</Button>
-    || ''
-}
+                    <DialogActions style={{ width: '100%', marginTop: '30px' }}>
+                        {
+                            (transactionStatus == 'confirm') && <Button fullWidth variant="contained" type="submit" size="large"> Waiting Confirm... </Button>
+                            || (transactionStatus == 'pending') && <Button fullWidth variant="contained" type="submit" size="large"> Pending... </Button>
+                            || (transactionStatus == '') && <Button fullWidth variant="contained" type="submit" color="primary" size="large" onClick={handlePoolName}>Submit</Button>
+                            || ''
+                        }
                     </DialogActions>
                 </DialogContent>
             </Dialog>

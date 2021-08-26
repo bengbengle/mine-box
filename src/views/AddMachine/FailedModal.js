@@ -44,7 +44,8 @@ export default function AlertDialogSlide({ show, handleCloseModal }) {
                 }}>
                     <SuccessIcon />
                     <DialogContentText id="alert-dialog-slide-description" style={{'text-align': 'center' }}>
-                    Congratulations, the withdrawal application is successful
+                        {/* Congratulations, the withdrawal application is successful */}
+                        Add Machine Failed 
                     </DialogContentText>
                 </DialogContent>
             </Dialog>

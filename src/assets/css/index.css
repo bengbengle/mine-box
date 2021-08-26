@@ -250,7 +250,10 @@ a {
 /* staking */
 
 .MuiTypography-body1 {
-  font-size: 0.8rem !important;
+  font-size: 0.9rem !important;
+}
+.MuiBottomNavigationAction-label {
+  font-size: 0.9rem!important;
 }
 
 .MuiIconButton-root {
@@ -283,6 +286,7 @@ a {
   width: 95% !important;
   margin: 0px auto !important;
   display: flex;
+  margin-bottom: 20px!important;
   place-content: space-evenly;
 }
 .addmachineButton button {
@@ -308,15 +312,19 @@ a {
 }
 .cycle-item-actve {
   border: 2px solid #ff6b22;
+  font-weight: 600;
 }
 .cycle-item-title {
   color: #ffffff;
   font-size: 0.8rem;
 }
 .cycle-item-value {
-  font-weight: 600;
+  font-weight: 500;
   color: #ff6b22;
   font-size: 1.2rem;
+}
+.cycle-item-actve > .cycle-item-value {
+  font-weight: 600;
 }
 
 .MuiBottomNavigation-root {
@@ -377,4 +385,22 @@ a {
   margin: 0px auto;
   align-items: center;
   justify-content: center;
+}
+
+@keyframes rotation{
+  from {-webkit-transform: rotate(0deg);}
+  to {-webkit-transform: rotate(-360deg);}
+}
+
+@-webkit-keyframes rotation{
+  from {-webkit-transform: rotate(0deg);}
+  to {-webkit-transform: rotate(-360deg);}
+}
+.loading {
+  transform: rotate(360deg);
+  -webkit-transform: rotate(360deg);
+  animation: rotation 0.8s linear infinite;
+  -moz-animation: rotation 0.8s linear infinite;
+  -webkit-animation: rotation 0.8s linear infinite;
+  -o-animation: rotation 0.8s linear infinite;
 }

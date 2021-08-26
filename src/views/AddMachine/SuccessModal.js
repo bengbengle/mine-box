@@ -45,7 +45,7 @@ export default function AlertDialogSlide({ show, handleCloseModal }) {
                 }}>
                     <SuccessIcon />
                     <DialogContentText id="alert-dialog-slide-description" style={{'text-align': 'center' }}>
-                        Congratulations, add mine success
+                        Congratulations, add mine machine success
                     </DialogContentText>
                 </DialogContent>
             </Dialog>
