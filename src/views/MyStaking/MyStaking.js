@@ -67,7 +67,7 @@ const useStyles = makeStyles(() => ({
   }
 }))
 
-const HelpIcon = props => <img src='/assets/help.png' style={{ width: '1.2rem', height: '1.2rem' }} />
+const HelpIcon = props => <img src='/assets/help.png' style={{ width: '1rem', height: '1rem' }} />
 
 const legendStyles = () => ({
   root: {
@@ -249,7 +249,7 @@ const Index = () => {
         <Chart data={chart_data} className={classes.mychart}>
           <Title text="30.2 P" />
           <Palette scheme={colors} />
-          <PieSeries innerRadius={0.6} outerRadius={0.9} valueField="val" argumentField="category" />
+          <PieSeries innerRadius={0.5} outerRadius={0.7} valueField="val" argumentField="category" />
           <Legend position="bottom" rootComponent={Root} itemComponent={Item} labelComponent={Label} />
         </Chart>
       </Card>

@@ -91,7 +91,7 @@ const useStyles = makeStyles(() => ({
 const AddIcon = props => <img src='/assets/add.png' style={{ width: '1rem', height: '1rem' }} />
 const MachineIcon = props => <img src='/assets/machine.png' />
 const RefreshIcon = props => <img src='/assets/refresh.png' />
-const NoDataIcon = props => <img src='/assets/nodata.png' style={{width: '50%'}} />
+const NoDataIcon = props => <img src='/assets/nodata.png' style={{width: '50%', maxWidth: '200px'}} />
 const pageSize = '30'
 
 const Index = ({ themeMode }) => {

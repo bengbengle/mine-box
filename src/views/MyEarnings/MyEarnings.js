@@ -202,13 +202,13 @@ const Index = ({ themeMode }) => {
     unit_desc: 'ADAM'
   }]
   const list2 = [{
-    title: 'Locked',
+    title: '',
     value: totalLock,
-    unit_desc: 'ADAM'
+    unit_desc: 'Locked(ADAM)'
   }, {
-    title: 'Number of miners',
+    title: '',
     value: times,
-    unit_desc: ''
+    unit_desc: 'Number of miners'
   }]
 
   const MyCardContent = ({ title, value, unit_desc }) => {
@@ -268,7 +268,7 @@ const Index = ({ themeMode }) => {
         }}>
           <Title text="329.8347（ADAM）" className={classes.chartTitle} />
           <Palette scheme={chart_scheme} />
-          <PieSeries innerRadius={0.6} outerRadius={0.9} valueField="val" argumentField="category" />
+          <PieSeries innerRadius={0.5} outerRadius={0.7} valueField="val" argumentField="category" />
           <EventTracker onClick={clickTooltip} />
           {/* <Tooltip
             targetItem={tips}

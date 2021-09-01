@@ -305,8 +305,8 @@ const AddMachine = props => {
                 || ''
                 : (approvestatus=='confirm') &&  <Button variant="contained" type="submit" size="large"> Waiting Confirm... </Button> 
                 || (approvestatus=='pending') &&  <Button variant="contained" type="submit" size="large"> pending... </Button> 
-                || <Button variant="contained" type="submit" size="large" onClick={approve} >
-                    { approvestatus ? 'Has Approved' : 'Approve' }
+                || <Button variant="contained" type="submit" size="large" color="primary" onClick={approve} >
+                    { 'Approve' }
                   </Button>
             }
           </Grid>

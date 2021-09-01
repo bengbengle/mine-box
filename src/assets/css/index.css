@@ -302,7 +302,7 @@ a {
 .cycle-item {
   background-color: #444444;
 
-  border-radius: 30px;
+  border-radius: 15px;
   width: 30%;
   height: 80px;
   display: flex;
@@ -320,11 +320,11 @@ a {
 }
 .cycle-item-value {
   font-weight: 500;
-  color: #ff6b22;
   font-size: 1.2rem;
 }
 .cycle-item-actve > .cycle-item-value {
   font-weight: 600;
+  color: #ff6b22;
 }
 
 .MuiBottomNavigation-root {
@@ -369,13 +369,16 @@ a {
   color: #ff6b22;
   font-weight: 500;
 }
-.MuiAlert-standardSuccess {
+/* .MuiAlert-standardSuccess {
   color: #ff6b25 !important;
 }
 .MuiAlert-standardSuccess .MuiAlert-icon {
   color: #ff6b25 !important;
-}
-
+} */
+/* .MuiAlert-standardError{
+  color: rgb(249 105 34)!important;
+  background-color: rgb(26 32 44)!important;
+} */
 .networkTips {
   position: absolute;
   width: 100%;

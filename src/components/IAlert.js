@@ -24,6 +24,7 @@ const IAlert = ({show, setOpenAlert, status= 'success'}) => {
     return (
         <Collapse in={show} className={classes.root} >
             <Alert
+                // severity="success"
                 action={
                     <IconButton
                         aria-label="close"

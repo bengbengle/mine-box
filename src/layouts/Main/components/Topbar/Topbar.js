@@ -168,25 +168,28 @@ const Topbar = ({ themeMode, themeToggler, onSidebarOpen, className, ...rest }) 
             />
           </a>
         </div>
-        <div className={classes.accountAddress}>
-          <div className={classes.accountIcon}>
-            <AccountIcon />
+        {
+          accountDisplay && <div className={classes.accountAddress}>
+            <div className={classes.accountIcon}>
+              <AccountIcon />
+            </div>
+            {accountDisplay}
           </div>
-          {accountDisplay}
-        </div>
-
-        <div className={classes.accountWallet}>
-          <Button
-            onClick={e => connect()}
-            variant="contained"
-            color="primary"
-            size="small"
-            className={classes.button}
-            startIcon={<ExchangeIcon />}
-          >
-            Wallet
-          </Button>
-        </div>
+        }
+        {
+          !accountDisplay && <div className={classes.accountWallet}>
+            <Button
+              onClick={e => connect()}
+              variant="contained"
+              color="primary"
+              size="small"
+              className={classes.button}
+              startIcon={<ExchangeIcon />}
+            >
+              Wallet
+            </Button>
+          </div>
+        }
       </div>
     </Toolbar>
   )
