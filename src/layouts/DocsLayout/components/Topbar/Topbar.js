@@ -72,7 +72,7 @@ const TopBar = ({
     >
       <Toolbar>
         <div className={classes.logoContainer}>
-          <a href="/" title="Powerhub">
+          <a href="/" title="Adam Box">
             <Image
               className={classes.logoImage}
               src={'/assets/logo.png'}
