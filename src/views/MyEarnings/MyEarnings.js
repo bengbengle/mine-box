@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useHistory } from "react-router-dom"
 import { makeStyles, Button, Card, CardContent, Typography } from '@material-ui/core';
 import {
-  Chart, 
-  PieSeries, 
+  Chart,
+  PieSeries,
   Title,
   Tooltip,
   Legend
@@ -12,6 +12,7 @@ import {
   Palette,
   EventTracker,
 } from "@devexpress/dx-react-chart";
+import BigNumber from "bignumber.js";
 
 import { withStyles } from '@material-ui/core/styles'
 import { request as req } from '../../req'
@@ -112,102 +113,71 @@ const Index = ({ themeMode }) => {
   const [totalProfit, setTotalProfit] = useState(0); // 总收益
   const [totalRelease, setTotalRelease] = useState(0); // 总释放
   const [totalLock, setTotalLock] = useState(0); // 总释放
+  const [minertimes, setMinerTimes] = useState(0); // 总质押次数
+  const [chartdata, setChartData] = useState([
+    { category: "Whole network profit", val: 99 },
+    { category: "Current profit", val: 1 }
+  ])
 
-  const [times, setTimes] = useState(0); // 总质押次数
   const history = useHistory()
 
   const classes = useStyles();
-  
+
   const { account, get_pledgeinfo } = useWallet()
+
+  const formatNum = (num, dec = 4) => {
+    let x = new BigNumber(num);
+    let x_str = x.toFixed(dec);
+    return x_str
+  }
 
   const getMyEarnInfo = async (address) => {
 
-   
-    const url = '/miner/getUserProfit'
-    const res = await req.post(url, {address: address})
+    const url = '/profit/getUserProfit'
+    const res = await req.post(url, { address: address })
+
+    setTotalRelease(res && res.total_release || 0)
+    setTotalProfit(res && res.total_profit || 0)
+    setTotalLock(res && res.total_lock || 0)
+    setMinerTimes(res && res.miner_count || 0)
 
 
+    let all_profit = res && res.all_profit || 0
+    let my_profit = res && res.total_profit || 0
 
-    // console.log('总收益额', res&&res.total_profit || 0)
-    
-    
-
-    const url1 = '/miner/getMinerNumber'
-    const times = await req.post(url1, {address: address})
-
-    console.log('times:::', times)
-    // - total_profit：总收益
-    // - total_release ：总释放
-    // - total_lock：总锁仓   
-    setTotalRelease(res&&res.total_release || 0)
-    setTotalProfit(res&&res.total_profit || 0)
-    setTotalLock(res&&res.total_lock || 0)
-    setTimes(times || 0)
-    console.log(res)
-  }
-  const changeTooltip = targetItem => {
-    const index = targetItem && targetItem.point || 0
-    console.log(targetItem, index, chart_data[index])
-    setTips(targetItem)
+    setChartData([
+      { category: "Whole network profit", val: all_profit },
+      { category: "Current profit", val: my_profit }
+    ])
   }
 
-
-  const chart_data = [
-    { category: "Whole network profit", val: 5 },
-    { category: "Current profit", val: 20 }
-  ]
+  // const chart_data = [
+  //   { category: "Whole network profit", val: 5 },
+  //   { category: "Current profit", val: 20 }
+  // ]
 
   const chart_scheme = ["#EF0A0A", "#FF6B22"];
-
-  const tooltipContentTitleStyle = {
-    fontWeight: 'bold',
-    paddingBottom: 0,
-  };
-  const tooltipContentBodyStyle = {
-    paddingTop: 0,
-  };
 
   const clickTooltip = (props) => {
     console.log(props)
   }
 
-  const TooltipContent = (props) => {
-    const { targetItem, text, ...restProps } = props;
-    console.log(props)
-    return (
-      <div>
-        <div>
-          <Tooltip.Content
-            {...restProps}
-            style={tooltipContentTitleStyle}
-          />
-        </div>
-        <div>
-          <Tooltip.Content
-            {...restProps}
-            style={tooltipContentBodyStyle}
-          />
-        </div>
-      </div>
-    );
-  };
-
   const list = [{
     title: 'Total revenue',
-    value: totalProfit,
+    value: formatNum(totalProfit),
     unit_desc: 'ADAM'
   }, {
     title: 'Total Release',
-    value: totalRelease,
+    value: formatNum(totalRelease),
     unit_desc: 'ADAM'
   }]
   const list2 = [{
     title: '',
-    value: totalLock,
+    value: formatNum(totalLock),
     unit_desc: 'Locked(ADAM)'
   }, {
     title: '',
-    value: times,
+    value: minertimes,
     unit_desc: 'Number of miners'
   }]
 
@@ -226,24 +196,23 @@ const Index = ({ themeMode }) => {
       </CardContent>
     </div>
   }
-  const CardList = ({list}) => (
+  const CardList = ({ list }) => (
 
-    <Card className={classes.cardBox} data-aos='fade-up'> 
-    {
-      list.map(({ title, value, unit_desc }, key) => (
-        <MyCardContent
-          key={key}
-          title={title}
-          value={value}
-          unit_desc={unit_desc}>
-
-        </MyCardContent>
-      ))
-    }
+    <Card className={classes.cardBox} data-aos='fade-up'>
+      {
+        list.map(({ title, value, unit_desc }, key) => (
+          <MyCardContent
+            key={key}
+            title={title}
+            value={value}
+            unit_desc={unit_desc}>
+          </MyCardContent>
+        ))
+      }
     </Card>
   )
 
-  
+
   const clickWithdrawButton = props => {
     history.push('/withdraw')
   }
@@ -258,7 +227,7 @@ const Index = ({ themeMode }) => {
       <CardList list={list2}></CardList>
 
       <Card className={classes.cardBox} data-aos='fade-up'>
-        <Chart data={chart_data} style={{
+        <Chart data={chartdata} style={{
           width: '90%',
           marginLeft: '5%',
           lineHeight: '45px',
@@ -270,11 +239,6 @@ const Index = ({ themeMode }) => {
           <Palette scheme={chart_scheme} />
           <PieSeries innerRadius={0.5} outerRadius={0.7} valueField="val" argumentField="category" />
           <EventTracker onClick={clickTooltip} />
-          {/* <Tooltip
-            targetItem={tips}
-            onTargetItemChange={changeTooltip}
-            contentComponent={TooltipContent}
-          /> */}
           <Legend position="bottom" rootComponent={Root} itemComponent={Item} labelComponent={Label} />
         </Chart>
       </Card>

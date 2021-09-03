@@ -5,6 +5,7 @@ import { Grid, Typography, TextField, Button, Divider } from '@material-ui/core'
 import { useWallet } from '../../useWallet'
 import { request as req } from '../../req'
 
+import BigNumber from "bignumber.js";
 import IAlert from '../../components/IAlert'
 
 const useStyles = makeStyles(theme => ({
@@ -63,62 +64,76 @@ const Index = () => {
     const [extractableAmount, setExtractableAmount] = useState(0)
     const [openAlert, setopenAlert] = React.useState(false);
 
-    const withdrawAll = async (address) => {
-        const url = '/profit/sendPledgeAmount'
+    const unstakingAll = async (address) => {
+        const url = '/miner/drawAmount'
         const res = await req.post(url, { address: address })
+
+        // total_adam: 0
+        // total_power: 0
+
         setopenAlert(true)
-        console.log('res::', res)
+        console.log('res::', res.total_power)
+    }
+    const formatNum = (num, dec = 4) => {
+        let x = new BigNumber(num);
+        let x_str = x.toFixed(dec);
+        return x_str
     }
 
-    const getExtractableAmount = async (address) => {
-        const url = '/profit/getPledgeAmount'
+    const getStakingAmount = async (address) => {
+        const url = '/miner/getDrawAmount'
         const res = await req.post(url, { address: address })
-        setExtractableAmount(res)
+        const total_adam = res&& res.total_adam
+        setExtractableAmount(total_adam)
     }
 
     const handleOpenAlert = () => {
         console.log('handleOpenAlert')
     }
     useEffect(() => {
-        getExtractableAmount(account)
+        getStakingAmount(account)
     }, [])
     return (
         <div>
-            <IAlert show={openAlert} setOpenAlert={ setopenAlert }  />
+            <IAlert show={openAlert} setOpenAlert={setopenAlert} />
 
             <div className={classes.form}>
                 <Grid container spacing={2}>
                     <Grid item xs={12} className={classes.margin20}>
                         <div className='staking-box' >
                             <div className='number'>
-                                {extractableAmount}
+                                {extractableAmount || '0.0000'}
                             </div>
                             <div className='desc'>
                                 Extractable Pledge (ADAM)
                             </div>
                         </div>
-                        {/* <TextField
-                            placeholder="Please enter the withdrawal quantity"
-                            variant="outlined"
-                            name="message"
-                            fullWidth
-                        /> */}
                     </Grid>
                     <div className='tips-box'>
                         The pledge will be withdrawn to the address <span className='address'>{shortAccount()}</span>,
                         please pay attention to check it
                     </div>
                     <Grid item container className={classes.withdrawButton}>
-                        <Button
+                        {extractableAmount ? <Button
                             fullWidth
                             variant="contained"
                             type="submit"
                             color="primary"
                             size="large"
-                            onClick={e => withdrawAll(account)}
+                            onClick={e => unstakingAll(account)}
                         >
-                            Apply to withdraw pledge
+                            Withdraw pledge
                         </Button>
+                            :
+                            <Button
+                                fullWidth
+                                variant="contained"
+                                type="submit"
+                                size="large"
+                            >
+                                Withdraw pledge
+                            </Button>
+                        }
                     </Grid>
                 </Grid>
             </div>

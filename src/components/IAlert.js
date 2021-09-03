@@ -5,6 +5,8 @@ import IconButton from '@material-ui/core/IconButton';
 import Collapse from '@material-ui/core/Collapse';
 import CloseIcon from '@material-ui/icons/Close';
 import PropTypes from 'prop-types';
+import CheckIcon from '@material-ui/icons/Check';
+import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 
 import { makeStyles } from '@material-ui/core/styles'
 
@@ -24,7 +26,8 @@ const IAlert = ({show, setOpenAlert, status= 'success'}) => {
     return (
         <Collapse in={show} className={classes.root} >
             <Alert
-                // severity="success"
+                severity={status}
+                icon={ status=='success' ? <CheckIcon fontSize="inherit" /> : <HighlightOffIcon fontSize="inherit" /> }
                 action={
                     <IconButton
                         aria-label="close"
@@ -36,7 +39,7 @@ const IAlert = ({show, setOpenAlert, status= 'success'}) => {
                     </IconButton>
                 }
             >
-                { status == 'success' ? 'Success!' : 'Failed!' }
+                { status == 'success' ? 'Withdraw Success!' : 'Withdraw Failed!' }
             </Alert>
         </Collapse>
     )

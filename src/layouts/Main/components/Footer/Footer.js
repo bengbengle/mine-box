@@ -13,7 +13,6 @@ const useStyles = makeStyles(theme => ({
     width: '100%',
     position: 'fixed',
     bottom: '0px',
-    display: 'none',
     [theme.breakpoints.down('sm')]: {
       display: 'flex',
     }
@@ -40,6 +39,8 @@ const Footer = ({ tabIndex, setTabIndex }) => {
     <BottomNavigation
       value={tabIndex}
       onChange={(event, newValue) => {
+        if(tabIndex == newValue) return false;
+        console.log('onchange...', newValue)
         setTabIndex(newValue + '')
         history.push('/')
       }}

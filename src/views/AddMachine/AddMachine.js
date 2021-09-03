@@ -8,6 +8,7 @@ import { request as req } from '../../req'
 import SuccessModal from './SuccessModal'
 import FailedModal from './FailedModal'
 import clsx from 'clsx';
+import BigNumber from "bignumber.js";
 
 const useStyles = makeStyles(theme => ({
   icon: {
@@ -80,50 +81,41 @@ const AddMachine = props => {
   const [transactionStatus, setTransactionStatus] = useState('') // '' 、confirm 、pengding 、success 、fails  
 
   const [poolCode, setPoolCode] = useState('p12345678')
+  // device id
+  const [devId, setDevId] = useState('2010-1111-222-333') 
+  // const tmpdevId = 'ec24c456-b7cd-6aa9-eb33-e2cc89b3228c'
+
+
   const [pledgePower, setPledgePower] = useState(1)
 
-  const [devId, setDevId] = useState('ec24c456-b7cd-6aa9-eb33-e2cc89b3228b') // device id
-  const tmpdevId = 'ec24c456-b7cd-6aa9-eb33-e2cc89b3228c'
-
   // 获取算力 
-  const getPower = async () => {
-    let totalpower, usedpower
-    {
-      // 总算力
-      const url = '/miner/getMinerInfo'
-      const data = {
-        serialNumber: devId
-      }
-      const res = await req.post(url, data)
-      totalpower = res.disk_size
-    }
+  const getMinerInfo = async () => {
 
-    // 实际使用算力
-    {
-      let url = 'miner/getMinerPledgePower'
-      const data = { serialNumber: devId }
-      const res = await req.post(url, data)
-      usedpower = res || 0
-    }
-    let total = parseFloat(totalpower || 0)
-    let used = parseFloat(usedpower || 0)
-    let power = total - used
+    let url = 'miner/getMinerPledgePower'
+    const data = { serialNumber: devId }
+    const res = await req.post(url, data)
+
+    // total_power：实际空间算力
+    // power：剩余可用算力
+    const available_power = res && res.power || 0
+    const total_power = res && res.total_power || 0
 
     // orderId
     {
-      let url = 'miner/getOrderId'
-      const orderid = await req.post(url)
+      let url1 = 'miner/getOrderId'
+      const orderid = await req.post(url1)
       setOrderId(orderid)
     }
 
     // minerNo
     {
-      let url = 'miner/getMinerNo'
-      const minerNo = await req.post(url, { serialNumber: devId })
+      let url2 = 'miner/getMinerNo'
+      const minerNo = await req.post(url2, { serialNumber: devId })
       setMinerNo(minerNo)
     }
-    setTotalPower(totalpower)
-    setAvailabelPower(power)
+
+    setTotalPower(total_power)
+    setAvailabelPower(available_power)
   }
 
   const getAllowance = async () => {
@@ -149,7 +141,7 @@ const AddMachine = props => {
 
   useEffect(() => {
     getAllowance()
-    getPower()
+    getMinerInfo()
   }, [])
 
   useEffect(() => {
@@ -157,11 +149,11 @@ const AddMachine = props => {
     if (transactionStatus == 'failed') setFailed(true)
   }, [transactionStatus])
 
-
-  // useEffect(() => {
-  //   if (approveStatus == 'success') setApproveSuccess(true)
-  //   if (approveStatus == 'failed') setApproveFailed(true)
-  // }, [approveStatus])
+  const formatNum = (num, dec = 4) => {
+      let x = new BigNumber(num);
+      let x_str = x.toFixed(dec);
+      return x_str
+  }
 
   const approve = async () => {
     approval({ setApprovestatus })
@@ -171,9 +163,10 @@ const AddMachine = props => {
     const cycle = active == 0 ? 360 : active == 1 ? 540 : 1080
     try {
       const web3 = await connectWallet()
-      let amount_wei = web3.utils.toWei((amount * 100).toString(), 'mwei')
+      // let amount_wei = web3.utils.toWei((amount * 100).toString(), 'mwei')
+      let amount_wei = amount
       // console.log('amount_wei:', amount_wei)
-      const tx = await add_machine({ cycle, minerNo, orderId, devId: tmpdevId, poolCode, amount: amount_wei, pledgePower, setTransactionStatus })
+      const tx = await add_machine({ cycle, minerNo, orderId, devId: devId, poolCode, amount: amount_wei, pledgePower, setTransactionStatus })
     
     } catch (e) {
 
@@ -235,7 +228,7 @@ const AddMachine = props => {
                   <HelpIcon />
                 </div>
                 <div className='machine-item-value'>
-                  {totalPower} T
+                  { formatNum(totalPower) || '0.0000' } T
                 </div>
               </div>
             </div>
@@ -250,7 +243,7 @@ const AddMachine = props => {
                 </div>
                 <div className='machine-item-value'>
                   {
-                    availabelPower
+                    formatNum(availabelPower) || '0.0000'
                   } T
                 </div>
               </div>

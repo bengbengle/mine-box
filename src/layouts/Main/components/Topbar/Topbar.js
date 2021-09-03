@@ -19,7 +19,7 @@ const useStyles = makeStyles(theme => ({
   },
   toolbar: {
     zIndex: 999,
-    maxWidth: theme.layout.contentWidth,
+    // maxWidth: theme.layout.contentWidth,
     width: '100%',
     margin: '0px auto',
     position: 'sticky',

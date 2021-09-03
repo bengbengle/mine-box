@@ -182,6 +182,7 @@ a {
 }
 .detail-header-icon img {
   width: 60%;
+  max-width: 220px;
 }
 .detail-header-title {
   color: #ff6b22;
@@ -369,16 +370,19 @@ a {
   color: #ff6b22;
   font-weight: 500;
 }
-/* .MuiAlert-standardSuccess {
-  color: #ff6b25 !important;
+
+.MuiAlert-standardSuccess {
+  color: rgb(72 158 72)!important;
 }
-.MuiAlert-standardSuccess .MuiAlert-icon {
-  color: #ff6b25 !important;
-} */
-/* .MuiAlert-standardError{
-  color: rgb(249 105 34)!important;
-  background-color: rgb(26 32 44)!important;
-} */
+
+.MuiAlert-standardError{
+  color: #ec0000!important;
+}
+
+.MuiAlert-standardError .MuiAlert-icon{
+  color: #ec0000!important;
+}
+
 .networkTips {
   position: absolute;
   width: 100%;

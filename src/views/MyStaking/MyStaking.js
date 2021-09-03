@@ -10,10 +10,10 @@ import {
 import {
   Palette,
 } from "@devexpress/dx-react-chart"
+import BigNumber from "bignumber.js";
 
 import { useWallet } from '../../useWallet'
 import { request as req } from '../../req'
-
 
 import { withStyles } from '@material-ui/core/styles'
 
@@ -169,34 +169,53 @@ const Index = () => {
   const history = useHistory()
   const { account, get_pledgeinfo } = useWallet()
 
-  const [total_pledge_adam, set_total_pledge_adam] = useState(0); // 总质押adam
-  const [total_pledge_power, set_total_pledge_power] = useState(0); // 总质押算力
+  const [total_pledge_adam, set_total_pledge_adam] = useState(0); // 总质押 adam
+  const [total_pledge_power, set_total_pledge_power] = useState(0); // 总质押 算力
+
   const [total_pledge_withdraw, set_total_pledge_withdraw] = useState(0); // 总质押算力
  
+  const [expired_power, set_expired_power] = useState(0); // 已到期 算力
+  const [extracted_adam, set_extracted_adam] = useState(0); // 已提取 算力
+
+  const [chart_data, set_chart_data] = useState([
+      { category: "Total Pledge", val: 99 },
+      { category: "My Pledge", val: 1 }
+  ])
 
   const getMyStakingInfo = async (address) => {
-    const url = '/miner/getUserProfit'
+    const url = '/miner/getUserPledge'
     const res = await req.post(url, { address: address })
     console.log(res)
+  
+    set_total_pledge_adam(res && res.total_adam || 0) // 总质押 adam
+    set_total_pledge_power(res && res.total_pledge || 0) // 总质押 power
 
-    let info = await get_pledgeinfo()
+    set_expired_power(res && res.total_date || 0) // 已到期
+    set_extracted_adam(res && res.total_draw || 0) // 已提取
 
-    console.log('info:::', info)
-    set_total_pledge_adam(info && info.total_pledge_adam || 0)
-    set_total_pledge_power(info && info.total_pledge_power || 0)
-    set_total_pledge_withdraw(info && info.total_pledge_withdraw || 0)
+    let all_pledge = res && res.all_pledge || 0
+    let total_pledge = res && res.total_pledge || 0
+     
+    set_chart_data([
+        { category: "Total Pledge", val: all_pledge },
+        { category: "My Pledge", val: total_pledge }
+    ])
 
+
+  
+
+  }
+
+  const formatNum = (num, dec = 4) => {
+    let x = new BigNumber(num);
+    let x_str = x.toFixed(dec);
+    return x_str
   }
 
   const clickWithdrawButton = props => {
     history.push('/unstaking')
   }
-
-  const chart_data = [
-    { category: "Total Pledge", val: 5 },
-    { category: "My Pledge", val: 20 }
-  ]
-
+ 
   const colors = ["#EF0A0A", "#FF6B22"]
   
   useEffect(() => {
@@ -209,7 +228,7 @@ const Index = () => {
         <CardItem
           key={0}
           title={'Pledge Power'}
-          value={total_pledge_power}
+          value={formatNum(total_pledge_power) }
           classes={classes}
           has_help={true}
           unit_desc={'PIB'}>
@@ -217,7 +236,7 @@ const Index = () => {
         <CardItem
           key={1}
           title={'Total pledge'}
-          value={total_pledge_adam}
+          value={formatNum(total_pledge_adam)}
           classes={classes}
           has_help={true}
           unit_desc={'ADAM'}>
@@ -227,7 +246,7 @@ const Index = () => {
         <CardItem
           key={0}
           title={'Expired'}
-          value={'0'}
+          value={formatNum(expired_power)}
           classes={classes}
           has_help={true}
           unit_desc={'PIB'}>
@@ -235,7 +254,7 @@ const Index = () => {
         <CardItem
           key={1}
           title={'Extracted'}
-          value={total_pledge_withdraw}
+          value={formatNum(total_pledge_withdraw)}
           classes={classes}
           has_help={true}
           unit_desc={'ADAM'}>
@@ -247,7 +266,7 @@ const Index = () => {
         margin: '0px auto!important'
       }} data-aos='fade-up'>
         <Chart data={chart_data} className={classes.mychart}>
-          <Title text="30.2 P" />
+          <Title text={formatNum(total_pledge_power) + ' P' }  />
           <Palette scheme={colors} />
           <PieSeries innerRadius={0.5} outerRadius={0.7} valueField="val" argumentField="category" />
           <Legend position="bottom" rootComponent={Root} itemComponent={Item} labelComponent={Label} />

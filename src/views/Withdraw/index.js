@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { makeStyles } from '@material-ui/core/styles'
 import { Grid, Typography, TextField, Button, Divider } from '@material-ui/core'
+import BigNumber from "bignumber.js";
 import { useWallet } from '../../useWallet'
 import { request as req } from '../../req'
 
@@ -65,18 +66,34 @@ const Index = () => {
     const { shortAccount, account } = useWallet()
     const [extractableAmount, setExtractableAmount] = useState(0)
     const [openAlert, setopenAlert] = React.useState(false);
+    const [status, setStatus] = React.useState('success');
 
     const withdrawAll = async (address) => {
-        const url = '/profit/sendProfit'
-        const res = await req.post(url, { address: address })
-        setopenAlert(true)
+        try {
+            const url = '/profit/drawProfit'
+            const res = await req.post(url, { address: address })
+            console.log('res::', res)
+            setStatus('success')
+            setopenAlert(true)
+            
+            await getExtractableAmount(address)
+        } catch(ex) {
+            setStatus('error')
+            setopenAlert(true)
+        }
     }
 
+    const formatNum = (num, dec = 4) => {
+        let x = new BigNumber(num);
+        let x_str = x.toFixed(dec);
+        return x_str
+    }
     const getExtractableAmount = async (address) => {
-        const url = '/profit/getCalcPledge'
+        const url = '/profit/getSendProfit'
         const res = await req.post(url, { address: address })
+        const amount = res && res.amount || 0
         console.log('res::', res)
-        setExtractableAmount(res || '0.0000')
+        setExtractableAmount(amount)
     }
 
     useEffect(() => {
@@ -85,25 +102,19 @@ const Index = () => {
 
     return (
         <div>
-            <IAlert show={openAlert} setOpenAlert={setopenAlert} />
+            <IAlert show={openAlert} setOpenAlert={setopenAlert} status={status} />
 
             <div className={classes.form}>
                 <Grid container spacing={2}>
                     <Grid item xs={12} className={classes.margin20}>
                         <div className='staking-box' >
                             <div className='number'>
-                                {extractableAmount}
+                                {formatNum(extractableAmount) || '0.0000' }
                             </div>
                             <div className='desc'>
                                 Extractable Earn (ADAM)
                             </div>
                         </div>
-                        {/* <TextField
-                            placeholder="Please enter the withdrawal quantity"
-                            variant="outlined"
-                            name="message"
-                            fullWidth
-                        /> */}
 
                     </Grid>
                     <div className='tips-box'>
@@ -111,16 +122,16 @@ const Index = () => {
                         please pay attention to check it
                     </div>
                     <Grid item container className={classes.withdrawButton}>
-                        <Button
+                        {extractableAmount ? <Button
                             onClick={e => withdrawAll(account)}
                             fullWidth
                             variant="contained"
                             type="submit"
                             color="primary"
                             size="large"
-                        >
-                            Withdraw
-                        </Button>
+                        > Withdraw </Button> :
+                            <Button fullWidth variant="contained" type="submit" size="large"> Withdraw </Button>
+                        }
                     </Grid>
                 </Grid>
             </div>
