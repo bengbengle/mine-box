@@ -25,7 +25,7 @@ const useStyles = makeStyles(() => ({
   cardBox: {
     minWidth: 275,
     background: '#303030',
-    marginTop: '5%',
+    // marginTop: '5%',
     margin: '0.8rem auto',
     maxWidth: '1236px',
     display: 'flex',
@@ -233,7 +233,6 @@ const Index = ({ themeMode }) => {
           lineHeight: '45px',
           padding: '0px',
           margin: '10px auto',
-          marginTop: '5%',
         }}>
           <Title text="329.8347（ADAM）" className={classes.chartTitle} />
           <Palette scheme={chart_scheme} />

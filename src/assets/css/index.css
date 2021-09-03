@@ -350,7 +350,8 @@ a {
 
 .tips-box {
   display: inline-block;
-  margin: 12px;
+  margin: 12px auto;
+  max-width: 95%;
   background: #2a2a2a;
   padding: 1.2rem;
   border-radius: 30px;
@@ -358,7 +359,6 @@ a {
   font-weight: 400;
   color: #525252;
   line-height: 1.2rem;
-  /* position: absolute; */
   bottom: 105px;
 }
 .tips-box .address {
@@ -405,4 +405,9 @@ a {
   -moz-animation: rotation 0.8s linear infinite;
   -webkit-animation: rotation 0.8s linear infinite;
   -o-animation: rotation 0.8s linear infinite;
+}
+
+#__vconsole .vc-switch {
+  bottom: 60px!important;
+  background-color: #ff6b22!important;
 }

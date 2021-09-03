@@ -66,6 +66,7 @@ const Index = ({ themeMode, tabIndex, ...rest }) => {
 
   useEffect(() => {
     initweb3()
+    getpoolname()
   }, [])
 
   useEffect(() => {

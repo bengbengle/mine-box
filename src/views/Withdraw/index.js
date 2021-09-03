@@ -20,6 +20,9 @@ const useStyles = makeStyles(theme => ({
         width: '95%',
         margin: '0px auto',
         border: 'none',
+        display: 'flex',
+        maxWidth: '1236px',
+        minWidth: '275px',
         'border-radius': '30px',
         '& .MuiTextField-root': {
             'border-radius': '30px',

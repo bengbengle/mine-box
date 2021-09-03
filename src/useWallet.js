@@ -5,8 +5,8 @@ import { useWeb3React } from '@web3-react/core'
 import contract_abi from './abi/contract.json'
 import adam_abi from './abi/adam.json'
 
-const miner_address = '0xAbE058f40f532749A180d83fCBf12D78E09606F2'
-const adam_address = '0x3664cBA2553a48f09B3bf58B6d4A42d18F11Ee07'
+const miner_address = '0xdaFbb2FA0559D7DD17C6400979041cfE3cefE865'
+const adam_address = '0xD91B0A418Aea5bCc75d6bFD272C31AFE9D7cAa9c'
 
 export const useWallet = () => {
 
@@ -88,17 +88,17 @@ export const useWallet = () => {
         return mine_contract
     }
 
-    const get_pledgeinfo = async () => {
-        const my_contract = await get_contract()
-        const pledge_info = await my_contract.methods.getPledgeInfo()
+    // const get_pledgeinfo = async () => {
+    //     const my_contract = await get_contract()
+    //     const pledge_info = await my_contract.methods.getPledgeInfo()
 
-        const info = await pledge_info.call({ from: account })
-        return {
-            total_pledge_adam: info[0],
-            total_pledge_power: info[1],
-            total_pledge_withdraw: info[2]
-        }
-    }
+    //     const info = await pledge_info.call({ from: account })
+    //     return {
+    //         total_pledge_adam: info[0],
+    //         total_pledge_power: info[1],
+    //         total_pledge_withdraw: info[2]
+    //     }
+    // }
 
     const set_pool_name = async (poolname) => {
         try {
@@ -115,6 +115,7 @@ export const useWallet = () => {
             const my_contract = await get_contract()
             const tx = await my_contract.methods.getPoolName()
             const poolname = await tx.call({ from: account })
+            console.log('poolname::', poolname)
             return poolname
         } catch (e) {
             console.log(e)
@@ -125,7 +126,7 @@ export const useWallet = () => {
         return new Promise(async (resolve, reject) => {
             try {
                 const my_contract = await get_contract()
-                const add = my_contract.methods.add(
+                const add = my_contract.methods.deposit(
                     amount,
                     pledgePower,
                     cycle,
@@ -208,7 +209,7 @@ export const useWallet = () => {
         connect,
         connectWallet,
         get_contract,
-        get_pledgeinfo,
+        // get_pledgeinfo,
         set_pool_name,
         get_pool_name,
         add_machine,

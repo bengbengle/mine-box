@@ -52,7 +52,7 @@ const useStyles = makeStyles(() => ({
   },
   mychart: {
     width: '96%',
-    marginTop: '5%',
+    // marginTop: '5%',
     marginLeft: '5%',
     lineHeight: '45px'
   },

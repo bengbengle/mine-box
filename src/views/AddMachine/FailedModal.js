@@ -18,7 +18,7 @@ const SuccessIcon = () => <img src='/assets/success.png' style={{
 
 export default function AlertDialogSlide({ show, handleCloseModal }) {
 
-    console.log('show::', show, 'handleCloseModal:', handleCloseModal)
+    // console.log('show::', show, 'handleCloseModal:', handleCloseModal)
 
     return (
         <div>

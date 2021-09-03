@@ -69,7 +69,7 @@ const AddMachine = props => {
   const [active, setActive] = useState(0)
   const [totalPower, setTotalPower] = useState(0)
   const [availabelPower, setAvailabelPower] = useState(0)
-  const [orderId, setOrderId] = useState('')
+  // const [orderId, setOrderId] = useState('')
   const [minerNo, setMinerNo] = useState('')
 
   const [success, setSuccess] = useState(false)
@@ -80,19 +80,19 @@ const AddMachine = props => {
   const [approvestatus, setApprovestatus] = useState('')
   const [transactionStatus, setTransactionStatus] = useState('') // '' 、confirm 、pengding 、success 、fails  
 
-  const [poolCode, setPoolCode] = useState('p12345678')
+  const [poolCode, setPoolCode] = useState('')
   // device id
-  const [devId, setDevId] = useState('2010-1111-222-333') 
+  const [devId, setDevId] = useState('')
   // const tmpdevId = 'ec24c456-b7cd-6aa9-eb33-e2cc89b3228c'
 
 
   const [pledgePower, setPledgePower] = useState(1)
 
   // 获取算力 
-  const getMinerInfo = async () => {
-
+  const getMinerInfo = async (id) => {
+    console.log('getMinerInfo', id)
     let url = 'miner/getMinerPledgePower'
-    const data = { serialNumber: devId }
+    const data = { serialNumber: id }
     const res = await req.post(url, data)
 
     // total_power：实际空间算力
@@ -100,17 +100,10 @@ const AddMachine = props => {
     const available_power = res && res.power || 0
     const total_power = res && res.total_power || 0
 
-    // orderId
-    {
-      let url1 = 'miner/getOrderId'
-      const orderid = await req.post(url1)
-      setOrderId(orderid)
-    }
-
     // minerNo
     {
       let url2 = 'miner/getMinerNo'
-      const minerNo = await req.post(url2, { serialNumber: devId })
+      const minerNo = await req.post(url2, { serialNumber: id })
       setMinerNo(minerNo)
     }
 
@@ -118,6 +111,7 @@ const AddMachine = props => {
     setAvailabelPower(available_power)
   }
 
+  // 获取是否已授权
   const getAllowance = async () => {
     get_allowance()
       .then(
@@ -138,10 +132,22 @@ const AddMachine = props => {
     setFailed(false)
     setTransactionStatus('')
   }
+  // device Id changed
+  const handleDeviceChanged = async (id) => {
+    console.log('id::', id)
+    setDevId(id)
+    getMinerInfo(id)
+  }
+
+  // pool code changed
+  const handlePoolCodeChanged = async (val) => {
+    setPoolCode(val)
+  }
 
   useEffect(() => {
     getAllowance()
-    getMinerInfo()
+    handleDeviceChanged('1630654290414CC0BD8F9600CAA3D')
+    handlePoolCodeChanged('M16306542038578956B89ED873C9DF')
   }, [])
 
   useEffect(() => {
@@ -150,26 +156,30 @@ const AddMachine = props => {
   }, [transactionStatus])
 
   const formatNum = (num, dec = 4) => {
-      let x = new BigNumber(num);
-      let x_str = x.toFixed(dec);
-      return x_str
+    let x = new BigNumber(num);
+    let x_str = x.toFixed(dec);
+    return x_str
   }
 
   const approve = async () => {
     approval({ setApprovestatus })
   }
 
+
+
   const addMachine = async () => {
     const cycle = active == 0 ? 360 : active == 1 ? 540 : 1080
     try {
+      const orderid = await req.post('miner/getOrderId')
+
+      console.log('orderid::', orderid)
+
       const web3 = await connectWallet()
       // let amount_wei = web3.utils.toWei((amount * 100).toString(), 'mwei')
       let amount_wei = amount
       // console.log('amount_wei:', amount_wei)
-      const tx = await add_machine({ cycle, minerNo, orderId, devId: devId, poolCode, amount: amount_wei, pledgePower, setTransactionStatus })
-    
+      const tx = await add_machine({ cycle, minerNo, orderId: orderid, devId: devId, poolCode, amount: amount_wei, pledgePower, setTransactionStatus })
     } catch (e) {
-
       setTransactionStatus('fails')
       console.log(e)
     }
@@ -193,7 +203,7 @@ const AddMachine = props => {
               name="code"
               fullWidth
               type="text"
-              onChange={e => setPoolCode(e.target.value)}
+              onChange={e => handlePoolCodeChanged(e.target.value)}
               value={poolCode}
             />
           </Grid>
@@ -203,11 +213,12 @@ const AddMachine = props => {
               variant="subtitle1"
               color="textPrimary"
               className={classes.inputTitle}
-              onChange={e => setDevId(e.target.value)}
+
             >
               Machine ID
             </Typography>
             <TextField
+              onChange={e => handleDeviceChanged(e.target.value)}
               placeholder="Input the Mining Machine ID"
               variant="outlined"
               size="medium"
@@ -228,7 +239,7 @@ const AddMachine = props => {
                   <HelpIcon />
                 </div>
                 <div className='machine-item-value'>
-                  { formatNum(totalPower) || '0.0000' } T
+                  {formatNum(totalPower) || '0.0000'} T
                 </div>
               </div>
             </div>
@@ -289,18 +300,18 @@ const AddMachine = props => {
 
           <Grid item container xs={12} className='addmachineButton'>
             {
-              approvestatus=='success' ?
+              approvestatus == 'success' ?
                 (transactionStatus == 'confirm') && <Button variant="contained" type="submit" size="large"> Waiting Confirm... </Button>
                 || (transactionStatus == 'pending') && <Button variant="contained" type="submit" size="large"> Pending... </Button>
                 || (transactionStatus == '') && <Button variant="contained" type="submit" color="primary" size="large" onClick={addMachine}>
-                      Staking Now
-                    </Button>
+                  Staking Now
+                </Button>
                 || ''
-                : (approvestatus=='confirm') &&  <Button variant="contained" type="submit" size="large"> Waiting Confirm... </Button> 
-                || (approvestatus=='pending') &&  <Button variant="contained" type="submit" size="large"> pending... </Button> 
+                : (approvestatus == 'confirm') && <Button variant="contained" type="submit" size="large"> Waiting Confirm... </Button>
+                || (approvestatus == 'pending') && <Button variant="contained" type="submit" size="large"> pending... </Button>
                 || <Button variant="contained" type="submit" size="large" color="primary" onClick={approve} >
-                    { 'Approve' }
-                  </Button>
+                  {'Approve'}
+                </Button>
             }
           </Grid>
         </Grid>

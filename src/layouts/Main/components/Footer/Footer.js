@@ -39,7 +39,7 @@ const Footer = ({ tabIndex, setTabIndex }) => {
     <BottomNavigation
       value={tabIndex}
       onChange={(event, newValue) => {
-        if(tabIndex == newValue) return false;
+        if(tabIndex == newValue && history.location.pathname == '/') return false;
         console.log('onchange...', newValue)
         setTabIndex(newValue + '')
         history.push('/')

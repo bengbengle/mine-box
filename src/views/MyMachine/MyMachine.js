@@ -226,7 +226,7 @@ const Index = ({ themeMode }) => {
   // 质押信息
   const getPledgeInfo = async () => {
 
-    let info = await get_pledgeinfo()
+    // let info = await get_pledgeinfo()
     const url1 = '/profit/getUserProfit'
     const res1 = await req.post(url1, { address: account })
 
