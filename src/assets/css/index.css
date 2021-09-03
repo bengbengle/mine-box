@@ -128,11 +128,6 @@ a {
   border-radius: 15px;
 }
 
-@media screen and (max-width: 1280px) {
-  .adam-card {
-    /* margin: 0.8rem 20px; */
-  }
-}
 .card-header {
   display: flex;
   flex-direction: row;
