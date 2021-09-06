@@ -66,7 +66,7 @@ const MachineDetails = ({location}) => {
       getMinerTimes()
     }, [])
   return (
-    <div>
+    <div data-aos='fade-up'>
       <SectionAlternate innerNarrowed> 
         <div className='detail-header'>
           <div className='detail-header-icon'>
@@ -80,7 +80,7 @@ const MachineDetails = ({location}) => {
           <div className='detail-body-up'>
             <div className='detail-body-up-item'>
               <div className='detail-body-up-item-label'>Current earnings</div>
-              <div className='detail-body-up-item-value'>{ profit || '0.0000'}</div>
+              <div className='detail-body-up-item-value'>{ formatNum( profit, 0)  || '0.0000'}</div>
               <div className='detail-body-up-item-desc'>ADAM</div>
             </div>
             <div className='detail-body-up-item'>

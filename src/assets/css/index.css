@@ -233,7 +233,7 @@ a {
   display: flex;
   flex-direction: row;
   align-content: space-around;
-  margin: 2rem;
+  margin: 2rem 0.8rem;
 }
 .detail-body-down-item-label {
   font-weight: 500;
@@ -387,6 +387,12 @@ a {
   margin: 0px auto;
   align-items: center;
   justify-content: center;
+}
+.networkTips .MuiCollapse-root {
+  width: 95%;
+  margin: 0.8rem auto;
+  max-width: 1236px;
+  min-width: 275px;
 }
 
 @keyframes rotation{

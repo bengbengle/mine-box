@@ -13,11 +13,11 @@ import {
   EventTracker,
 } from "@devexpress/dx-react-chart";
 import BigNumber from "bignumber.js";
+import CountUp from "react-countup";
 
 import { withStyles } from '@material-ui/core/styles'
 import { request as req } from '../../req'
 import { useWallet } from '../../useWallet'
-
 const useStyles = makeStyles(() => ({
   fontWeight900: {
     fontWeight: 900,
@@ -115,8 +115,8 @@ const Index = ({ themeMode }) => {
   const [totalLock, setTotalLock] = useState(0); // 总释放
   const [minertimes, setMinerTimes] = useState(0); // 总质押次数
   const [chartdata, setChartData] = useState([
-    { category: "Whole network profit", val: 99 },
-    { category: "Current profit", val: 1 }
+    { category: "Whole network profit", val: 100 },
+    { category: "Current profit", val: 0 }
   ])
 
   const history = useHistory()
@@ -145,16 +145,13 @@ const Index = ({ themeMode }) => {
     let all_profit = res && res.all_profit || 0
     let my_profit = res && res.total_profit || 0
 
+    console.log('all_profit:', all_profit)
+
     setChartData([
-      { category: "Whole network profit", val: all_profit },
-      { category: "Current profit", val: my_profit }
+      { category: "Whole network profit", val: (parseFloat(all_profit)  - parseFloat(my_profit)) },
+      { category: "My profit", val: my_profit }
     ])
   }
-
-  // const chart_data = [
-  //   { category: "Whole network profit", val: 5 },
-  //   { category: "Current profit", val: 20 }
-  // ]
 
   const chart_scheme = ["#EF0A0A", "#FF6B22"];
 
@@ -188,7 +185,7 @@ const Index = ({ themeMode }) => {
           {title}
         </Typography>
         <Typography className={classes.value} variant="h5" component="h2">
-          {value}
+          {unit_desc == 'Number of miners' ? value : <CountUp start={0} end={value} duration="1" decimal='.' decimals={4} separator=',' useGrouping="true" />}
         </Typography>
         <Typography className={classes.unit_desc} color="textSecondary" >
           {unit_desc}
@@ -198,7 +195,7 @@ const Index = ({ themeMode }) => {
   }
   const CardList = ({ list }) => (
 
-    <Card className={classes.cardBox} data-aos='fade-up'>
+    <Card className={classes.cardBox} >
       {
         list.map(({ title, value, unit_desc }, key) => (
           <MyCardContent
@@ -222,11 +219,11 @@ const Index = ({ themeMode }) => {
   }, [])
 
   return (
-    <div>
+    <div data-aos='fade-up'>
       <CardList list={list}></CardList>
       <CardList list={list2}></CardList>
 
-      <Card className={classes.cardBox} data-aos='fade-up'>
+      <Card className={classes.cardBox} >
         <Chart data={chartdata} style={{
           width: '90%',
           marginLeft: '5%',
@@ -234,14 +231,18 @@ const Index = ({ themeMode }) => {
           padding: '0px',
           margin: '10px auto',
         }}>
-          <Title text="329.8347（ADAM）" className={classes.chartTitle} />
+          <Title text={ 
+            // formatNum(chartdata[1].val) + ' ADAM ' 
+           <CountUp start={0} end={chartdata[1].val } suffix=" ADAM"  duration="1" decimal='.' decimals={4} separator=',' useGrouping="true" />
+           
+        }  className={classes.chartTitle} />
           <Palette scheme={chart_scheme} />
           <PieSeries innerRadius={0.5} outerRadius={0.7} valueField="val" argumentField="category" />
           <EventTracker onClick={clickTooltip} />
           <Legend position="bottom" rootComponent={Root} itemComponent={Item} labelComponent={Label} />
         </Chart>
       </Card>
-      <Card className={classes.bottomBox} data-aos='fade-up'>
+      <Card className={classes.bottomBox} >
         <Button
           onClick={clickWithdrawButton}
           fullWidth

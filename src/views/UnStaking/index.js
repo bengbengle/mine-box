@@ -98,7 +98,7 @@ const Index = () => {
         getStakingAmount(account)
     }, [])
     return (
-        <div>
+        <div data-aos='fade-up'>
             <IAlert show={openAlert} setOpenAlert={setopenAlert} />
 
             <div className={classes.form}>

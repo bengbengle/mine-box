@@ -1,16 +1,14 @@
 import React, { useEffect, useState, useRef } from 'react';
 import clsx from 'clsx';
 import { makeStyles, Button, Card, CardContent, Typography, Slide } from '@material-ui/core';
-// import useScroll from 'react-use-scroll';
-// import useScrollTrigger from '@material-ui/core/useScrollTrigger';
 import InfiniteScroll from "react-infinite-scroll-component";
-
+import CountUp from "react-countup";
 
 import { useHistory } from "react-router-dom";
 import { request as req } from '../../req'
 import { useWallet } from '../../useWallet'
-
 import BigNumber from "bignumber.js";
+import axios from 'axios'
 
 const useStyles = makeStyles(() => ({
   fontWeight900: {
@@ -110,29 +108,50 @@ const AddIcon = props => <img src='/assets/add.png' style={{ width: '1rem', heig
 const MachineIcon = props => <img src='/assets/machine.png' />
 const RefreshIcon = props => <img src='/assets/refresh.png' />
 const NoDataIcon = props => <img src='/assets/nodata.png' style={{ width: '50%', maxWidth: '200px' }} />
+
 const pageSize = '5'
+const selltoken = '0xcd28d5353c6612f76ada912a83f5c7107b1ecd4c'  // adam
+const buytoken = '0x55d398326f99059ff775485246999027b3197955'   // usdt
+const dodoBaseUrl = 'https://bsc.api.0x.org/swap/v1/price'
 
 const Index = ({ themeMode }) => {
   const [machinelist, setMachineList] = useState([]);
-  const [pledgeInfo, setPledgeInfo] = useState(null)
   const [currentPage, setCurrentPage] = useState(1)
-  const [totalPage, setTotalPage] = useState(0)
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(null)
   const [count, setCount] = useState(0)
-  const [scroll_h, set_scroll_h] = useState(0)
-  const [scrolltop, set_scrolltop] = useState(0)
 
-  const [lists, setlists] = useState([])
+  const [pledgeInfo, setPledgeInfo] = useState(
+    [
+      {
+        title: 'Pledge Power',
+        value: '...',
+        unit_desc: 'PIB'
+      }, {
+        title: 'Total pledge',
+        value: '...', //res1 && res1.total_lock || 0,
+        unit_desc: 'ADAM'
+      }
+    ]
+  )
 
-  // scroll_h, (scrollTop + viewportSize)
+  const [priceInfo, setPriceInfo] = useState(
+    [{
+      title: 'ADAM current price',
+      value: '0.0000',
+      unit_desc: ''
+    }, {
+      title: 'Estimated rate',
+      value: '400%',
+      className: 'redfont',
+      unit_desc: ''
+    }]
+  );
 
   const classes = useStyles();
   const history = useHistory();
-  const { account, get_pledgeinfo } = useWallet()
+  const { account } = useWallet()
 
-  const clickAddMachine = props => {
-    history.push('/addmachine')
-  }
+  const clickAddMachine = () => history.push('/addmachine')
 
   const formatNum = (num, precision = 0, dec = 4) => {
     if(!num) return 0
@@ -142,9 +161,8 @@ const Index = ({ themeMode }) => {
     return x_fixed
   }
 
-  const clickDetailMachine = props => {
-    history.push({ pathname: '/machineDetails', state: props })
-  }
+  const clickDetailMachine = props => history.push({ pathname: '/machineDetails', state: props })
+
   const machine_No = no => {
     if (no.length > 10) {
       const m_name = no && no.substr(0, 5) + '...' + no.substr(no.length - 5)
@@ -161,7 +179,8 @@ const Index = ({ themeMode }) => {
     }
     const res = await req.post(url, data)
 
-    const profit = res && res.total_profit || '0.0000'
+    console.log('res::', res)
+    const profit = res || '0.0000'
     return profit
   }
 
@@ -176,12 +195,21 @@ const Index = ({ themeMode }) => {
       }
       const res = await req.post(url, data)
       const { rows, count } = res
-      var tmp = []
-      tmp = machinelist.concat(rows)
-      console.log('lists:', tmp)
-      setMachineList(tmp)
+      // var list = []
+      var list = []
+      for (let idx = 0; idx < rows.length; idx++) {
+        list[idx] = rows[idx]
+        list[idx].amount = rows[idx].amount
+        let id = list[idx].serial_number
+        let profit = await getProfit(id)
+        list[idx].profit = profit
+        list[idx].total_profit = profit
+      }
+      
+      list = machinelist.concat(rows)
+      console.log('lists:', list)
+      setMachineList(list)
       setCurrentPage(page)
-
     }, 100);
   }
 
@@ -212,28 +240,25 @@ const Index = ({ themeMode }) => {
       let id = list[idx].serial_number
       let profit = await getProfit(id)
       list[idx].profit = profit
+      list[idx].total_profit = profit
     }
-    let totalPage = count / parseInt(pageSize)
-    totalPage = Math.ceil(totalPage)
-
     console.log('list:', list)
     
     setMachineList(list)
-    setTotalPage(totalPage)
     setCount(count)
     setLoading(false)
   }
 
   // 质押信息
   const getPledgeInfo = async () => {
-
-    // let info = await get_pledgeinfo()
+ 
     const url1 = '/profit/getUserProfit'
     const res1 = await req.post(url1, { address: account })
 
     const url2 = '/miner/getUserPledge'
     const res2 = await req.post(url2, { address: account })
-
+     
+    
     const total_pledge = res1 && res2.total_pledge || 0
     const total_adam = res2 && res2.total_adam || 0
 
@@ -244,23 +269,32 @@ const Index = ({ themeMode }) => {
         unit_desc: 'PIB'
       }, {
         title: 'Total pledge',
-        value: formatNum(total_adam, 8), //res1 && res1.total_lock || 0,
+        value: formatNum(total_adam, 8),
         unit_desc: 'ADAM'
       }
     ]
     setPledgeInfo(tmp)
-  }
 
-  const list2 = [{
-    title: 'ADAM current price',
-    value: formatNum('232.3421'),
-    unit_desc: ''
-  }, {
-    title: 'Estimated rate',
-    value: '400%',
-    className: 'redfont',
-    unit_desc: ''
-  }]
+
+    
+    let url_price = `${dodoBaseUrl}?sellToken=${selltoken}&buyToken=${buytoken}&sellAmount=10000000`
+
+    let res_price = await axios.get(url_price)
+    let price = res_price.data.price
+    
+    let price_info = [{
+      title: 'ADAM current price',
+      value: formatNum(price),
+      unit_desc: ''
+    }, {
+      title: 'Estimated rate',
+      value: '400%',
+      className: 'redfont',
+      unit_desc: ''
+    }]
+
+    setPriceInfo(price_info)
+  }
 
   useEffect(() => {
     getPledgeInfo()
@@ -268,7 +302,6 @@ const Index = ({ themeMode }) => {
     getMachineList()
   }, [])
  
-
   const MyCardContent = ({ title, value, unit_desc, class_name }) => {
     return <div style={{ width: '50%' }}>
       <CardContent className={classes.cardContent}>
@@ -276,7 +309,11 @@ const Index = ({ themeMode }) => {
           {title}
         </Typography>
         <Typography className={clsx(classes.value, class_name)} variant="h5" component="h2">
-          {value}
+          {
+            unit_desc == 'Estimated rate' ? value : 
+            <CountUp start={0} end={value} duration="1" decimal='.' decimals={4} separator=',' useGrouping="true" />
+          }
+          {/* <CountUp start={0} end={value} duration="1" decimal='.' decimals={4} separator=',' useGrouping="true" /> */}
         </Typography>
         <Typography className={classes.unit_desc} color="textSecondary" >
           {unit_desc}
@@ -302,6 +339,7 @@ const Index = ({ themeMode }) => {
   )
 
   const AdamCard = ({ item, key }) => {
+    console.log('item..', item)
     const {
       total_profit,
       m_no,
@@ -319,7 +357,7 @@ const Index = ({ themeMode }) => {
             {machine_No(m_no)}
           </div>
           <div className='header-profit'>
-            {formatNum(total_profit, 8) || '0.0000'}
+            {formatNum(total_profit) || '0.0000'}
           </div>
         </div>
         <div className='card-body'>
@@ -344,7 +382,8 @@ const Index = ({ themeMode }) => {
     <div>
 
       <CardList list={pledgeInfo}></CardList>
-      <CardList list={list2}></CardList>
+
+      <CardList list={priceInfo}></CardList>
 
       <div className={classes.account}>
         <div className={classes.groupTitle}>
@@ -365,7 +404,7 @@ const Index = ({ themeMode }) => {
       </div>
       {
         loading === true ? <div className={clsx(classes.loadingCls, 'loading')} ><RefreshIcon /></div> :
-          machinelist.length == count && count == 0 && currentPage == 1 ? <div className={classes.nodataCls}><NoDataIcon /></div>
+        loading === false && machinelist.length == count && count == 0 && currentPage == 1 ? <div className={classes.nodataCls}><NoDataIcon /></div>
             : ''
       }
       <InfiniteScroll

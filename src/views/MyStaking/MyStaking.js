@@ -11,6 +11,7 @@ import {
   Palette,
 } from "@devexpress/dx-react-chart"
 import BigNumber from "bignumber.js";
+import CountUp from "react-countup";
 
 import { useWallet } from '../../useWallet'
 import { request as req } from '../../req'
@@ -137,7 +138,8 @@ const CardItem = ({ classes, title, value, unit_desc, has_help }) => {
         }
       </Typography>
       <Typography className={classes.value} variant="h5" component="h2">
-        {value}
+        {/* {value} */}
+        <CountUp start={0} end={value} duration="1" decimal='.' decimals={4} separator=',' useGrouping="true" />
       </Typography>
       <Typography className={classes.unit_desc} color="textSecondary" >
         {unit_desc}
@@ -147,7 +149,7 @@ const CardItem = ({ classes, title, value, unit_desc, has_help }) => {
 }
 
 const CardList = ({ classes, list }) => (
-  <Card className={classes.cardBox} data-aos='fade-up'>
+  <Card className={classes.cardBox} >
     {
       list.map(({ title, value, unit_desc, has_help }, key) => (
         <CardItem
@@ -197,7 +199,7 @@ const Index = () => {
     let total_pledge = res && res.total_pledge || 0
      
     set_chart_data([
-        { category: "Total Pledge", val: all_pledge },
+        { category: "Total Pledge", val: (parseFloat(all_pledge)  - parseFloat(total_pledge)) },
         { category: "My Pledge", val: total_pledge }
     ])
 
@@ -224,8 +226,8 @@ const Index = () => {
   }, [])
 
   return (
-    <div>
-      <Card className={classes.cardBox} data-aos='fade-up'>
+    <div data-aos='fade-up'>
+      <Card className={classes.cardBox} >
         <CardItem
           key={0}
           title={'Pledge Power'}
@@ -243,7 +245,7 @@ const Index = () => {
           unit_desc={'ADAM'}>
         </CardItem>
       </Card>
-      <Card className={classes.cardBox} data-aos='fade-up'>
+      <Card className={classes.cardBox} >
         <CardItem
           key={0}
           title={'Expired'}
@@ -255,7 +257,7 @@ const Index = () => {
         <CardItem
           key={1}
           title={'Extracted'}
-          value={formatNum(total_pledge_withdraw, 8)}
+          value={formatNum(extracted_adam, 8)}
           classes={classes}
           has_help={true}
           unit_desc={'ADAM'}>
@@ -265,16 +267,18 @@ const Index = () => {
 
       <Card className={classes.cardBox} style={{
         margin: '0px auto!important'
-      }} data-aos='fade-up'>
+      }} >
         <Chart data={chart_data} className={classes.mychart}>
-          <Title text={formatNum(total_pledge_power) + ' P' }  />
+          <Title text={
+             <CountUp start={0} end={total_pledge_power } suffix=" P"  duration="1" decimal='.' decimals={4} separator=',' useGrouping="true" />
+          }/>
           <Palette scheme={colors} />
           <PieSeries innerRadius={0.5} outerRadius={0.7} valueField="val" argumentField="category" />
           <Legend position="bottom" rootComponent={Root} itemComponent={Item} labelComponent={Label} />
         </Chart>
       </Card>
 
-      <Card className={classes.bottomBox} data-aos='fade-up'>
+      <Card className={classes.bottomBox} >
         <Button
           onClick={clickWithdrawButton}
           fullWidth

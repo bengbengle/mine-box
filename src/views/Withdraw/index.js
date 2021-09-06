@@ -107,7 +107,7 @@ const Index = () => {
     }, [])
 
     return (
-        <div>
+        <div data-aos='fade-up'>
             <IAlert show={openAlert} setOpenAlert={setopenAlert} status={status} />
 
             <div className={classes.form}>

@@ -1,7 +1,7 @@
 import axios from 'axios'
 const request= axios.create({
-  // baseURL: 'https://mine.adamoracle.io/api/'
-  baseURL: 'http://47.241.183.80:10000/api/'
+  baseURL: 'https://mine.adamoracle.io/api/'
+  // baseURL: 'http://47.241.183.80:10000/api/'
 })
 
 // 添加请求拦截器

@@ -30,7 +30,10 @@ const useStyles = makeStyles(theme => ({
     width: '95%',
     margin: '0px auto',
     marginTop: '2rem',
-
+    margin: '0.8rem auto',
+    display: 'flex',
+    maxWidth: '1236px',
+    minWidth: '275px',
     '& .MuiTextField-root': {
       background: theme.palette.background.paper,
     },
@@ -237,7 +240,7 @@ const AddMachine = props => {
               value={devId}
             />
           </Grid>
-          <Grid item xs={12} sm={6}  >
+          <Grid item xs={12} >
             <div className={classes.machineItem} style={{
               borderTopLeftRadius: '10px',
               borderTopRightRadius: '10px'
