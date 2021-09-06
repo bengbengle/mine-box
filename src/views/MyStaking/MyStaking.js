@@ -206,10 +206,11 @@ const Index = () => {
 
   }
 
-  const formatNum = (num, dec = 4) => {
+  const formatNum = (num, precision = 0, dec = 4) => {
     let x = new BigNumber(num);
-    let x_str = x.toFixed(dec);
-    return x_str
+    let x_div = x.dividedBy(10 ** precision)
+    let x_fixed = x_div.toFixed(dec);
+    return x_fixed
   }
 
   const clickWithdrawButton = props => {
@@ -236,7 +237,7 @@ const Index = () => {
         <CardItem
           key={1}
           title={'Total pledge'}
-          value={formatNum(total_pledge_adam)}
+          value={formatNum(total_pledge_adam, 8)}
           classes={classes}
           has_help={true}
           unit_desc={'ADAM'}>
@@ -254,7 +255,7 @@ const Index = () => {
         <CardItem
           key={1}
           title={'Extracted'}
-          value={formatNum(total_pledge_withdraw)}
+          value={formatNum(total_pledge_withdraw, 8)}
           classes={classes}
           has_help={true}
           unit_desc={'ADAM'}>

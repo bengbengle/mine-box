@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 import { makeStyles, useTheme } from '@material-ui/core/styles';
-import { Grid, Typography, TextField, Button } from '@material-ui/core';
+import { Grid, Typography, TextField, Button, InputAdornment } from '@material-ui/core';
 import { useHistory } from "react-router-dom";
 import { useWallet } from '../../useWallet'
 import { request as req } from '../../req'
@@ -121,10 +121,16 @@ const AddMachine = props => {
       )
   }
 
-  const handleAmountChange = async (val) => {
-    setAmount(val)
-    let pledge = parseFloat(val) / 30
-    setPledgePower(pledge)
+  // const handleAmountChange = async (val) => {
+  //   setAmount(val)
+  //   let pledge = parseFloat(val) / 30
+  //   setPledgePower(pledge)
+  // }
+  
+  const handlePledgeChange = async (val) => {
+    setPledgePower(val)
+    let adam_num = parseFloat(val) * 30
+    setAmount(adam_num)
   }
 
   const handleCloseModal = () => {
@@ -146,8 +152,8 @@ const AddMachine = props => {
 
   useEffect(() => {
     getAllowance()
-    handleDeviceChanged('1630654290414CC0BD8F9600CAA3D')
-    handlePoolCodeChanged('M16306542038578956B89ED873C9DF')
+    // handleDeviceChanged('1630654290414CC0BD8F9600CAA3D')
+    // handlePoolCodeChanged('M16306542038578956B89ED873C9DF')
   }, [])
 
   useEffect(() => {
@@ -165,20 +171,23 @@ const AddMachine = props => {
     approval({ setApprovestatus })
   }
 
-
-
   const addMachine = async () => {
     const cycle = active == 0 ? 360 : active == 1 ? 540 : 1080
     try {
       const orderid = await req.post('miner/getOrderId')
-
       console.log('orderid::', orderid)
 
       const web3 = await connectWallet()
-      // let amount_wei = web3.utils.toWei((amount * 100).toString(), 'mwei')
-      let amount_wei = amount
+      let amount_wei = web3.utils.toWei((amount * 100).toString(), 'mwei')
+      // let amount_wei = amount
       // console.log('amount_wei:', amount_wei)
+      console.log({ cycle, minerNo, orderId: orderid, devId: devId, poolCode, amount: amount_wei, pledgePower, setTransactionStatus })
+
       const tx = await add_machine({ cycle, minerNo, orderId: orderid, devId: devId, poolCode, amount: amount_wei, pledgePower, setTransactionStatus })
+      
+      console.log('tx::', tx)
+      getMinerInfo(devId)
+
     } catch (e) {
       setTransactionStatus('fails')
       console.log(e)
@@ -273,13 +282,21 @@ const AddMachine = props => {
               (1T Storage Power needs to pledge 30 ADAM)
             </span>
             <TextField
-              placeholder="Please enter the pledge amount"
+              placeholder="Please enter the pledge power (T)"
               variant="outlined"
               name="message"
               fullWidth
-              onChange={e => handleAmountChange(e.target.value)}
-              value={amount}
+              onChange={e => handlePledgeChange(e.target.value)}
+              value={pledgePower}
+              endAdornment={<InputAdornment position="end">Kg</InputAdornment>}
+              aria-describedby="standard-weight-helper-text"
+              inputProps={{
+                'aria-label': 'T',
+              }}
             />
+            <span className='subtitle5'>
+              Expected pledge { amount } ADAM 
+            </span>
           </Grid>
           <Grid item xs={12} className='cycle-list'>
             <div className={active == 0 ? clsx('cycle-item', 'cycle-item-actve') : 'cycle-item'} onClick={e => setActive(0)}>
@@ -296,11 +313,18 @@ const AddMachine = props => {
               <div className='cycle-item-title'>Pledge cycle</div>
               <div className='cycle-item-value'>1080 DAY</div>
             </div>
+           
           </Grid>
 
           <Grid item container xs={12} className='addmachineButton'>
             {
-              approvestatus == 'success' ?
+              (!poolCode || !minerNo || !devId || !pledgePower) ?
+                  <Button variant="contained" type="submit" size="large">  
+                    Invalid pool code or machine id 
+                  </Button>
+                  :
+              (
+                approvestatus == 'success' ?
                 (transactionStatus == 'confirm') && <Button variant="contained" type="submit" size="large"> Waiting Confirm... </Button>
                 || (transactionStatus == 'pending') && <Button variant="contained" type="submit" size="large"> Pending... </Button>
                 || (transactionStatus == '') && <Button variant="contained" type="submit" color="primary" size="large" onClick={addMachine}>
@@ -310,8 +334,9 @@ const AddMachine = props => {
                 : (approvestatus == 'confirm') && <Button variant="contained" type="submit" size="large"> Waiting Confirm... </Button>
                 || (approvestatus == 'pending') && <Button variant="contained" type="submit" size="large"> pending... </Button>
                 || <Button variant="contained" type="submit" size="large" color="primary" onClick={approve} >
-                  {'Approve'}
-                </Button>
+                      {'Approve'}
+                    </Button>
+              )
             }
           </Grid>
         </Grid>

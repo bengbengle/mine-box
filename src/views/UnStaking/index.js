@@ -70,17 +70,18 @@ const Index = () => {
     const unstakingAll = async (address) => {
         const url = '/miner/drawAmount'
         const res = await req.post(url, { address: address })
-
-        // total_adam: 0
-        // total_power: 0
-
         setopenAlert(true)
-        console.log('res::', res.total_power)
+        
+        setTimeout(() => {
+            getStakingAmount(account)
+        }, 800);
     }
-    const formatNum = (num, dec = 4) => {
+  
+    const formatNum = (num, precision = 0, dec = 4) => {
         let x = new BigNumber(num);
-        let x_str = x.toFixed(dec);
-        return x_str
+        let x_div = x.dividedBy(10 ** precision)
+        let x_fixed = x_div.toFixed(dec);
+        return x_fixed
     }
 
     const getStakingAmount = async (address) => {
@@ -105,7 +106,7 @@ const Index = () => {
                     <Grid item xs={12} className={classes.margin20}>
                         <div className='staking-box' >
                             <div className='number'>
-                                {extractableAmount || '0.0000'}
+                                {formatNum(extractableAmount, 8)  || '0.0000'}
                             </div>
                             <div className='desc'>
                                 Extractable Pledge (ADAM)

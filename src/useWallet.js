@@ -125,6 +125,7 @@ export const useWallet = () => {
     const add_machine = ({ minerNo, orderId, devId, poolCode, amount, pledgePower, cycle, setTransactionStatus }) => {
         return new Promise(async (resolve, reject) => {
             try {
+                console.log({ minerNo, orderId, devId, poolCode, amount, pledgePower, cycle})
                 const my_contract = await get_contract()
                 const add = my_contract.methods.deposit(
                     amount,
@@ -135,7 +136,6 @@ export const useWallet = () => {
                     devId, // "ec24c456-b7cd-6aa9-eb33-e2cc89b3228c",
                     minerNo // "M1628750275558C94034F0631E74F3"
                 )
-                console.log('setTransactionStatus:', setTransactionStatus)
 
                 console.log('before signed ......')
                 setTransactionStatus('confirm')

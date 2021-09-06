@@ -4,7 +4,7 @@ import { Divider } from '@material-ui/core';
 import { Section, SectionAlternate } from 'components/organisms';
 import { useHistory, useLocation } from "react-router-dom";
 import { request as req } from '../../req'
-
+import BigNumber from "bignumber.js";
 
 const DetailIcon = props => <img src='/assets/detail.png' /> 
 
@@ -13,9 +13,19 @@ const useStyles = makeStyles(theme => ({
     paddingTop: theme.spacing(3),
     [theme.breakpoints.up('md')]: {
       paddingTop: theme.spacing(5),
-    },
-  },
+    }
+  }
 }));
+
+
+const formatNum = (num, precision = 0, dec = 4) => {
+  if(!num) return 0
+  let x = new BigNumber(num);
+  let x_div = x.dividedBy(10 ** precision)
+  let x_fixed = x_div.toFixed(dec);
+  return x_fixed
+}
+
 
 const MachineDetails = ({location}) => {
   const history = useHistory();
@@ -75,7 +85,7 @@ const MachineDetails = ({location}) => {
             </div>
             <div className='detail-body-up-item'>
               <div className='detail-body-up-item-label'>Current pledge</div>
-              <div className='detail-body-up-item-value'>{ pledge_amount }</div>
+              <div className='detail-body-up-item-value'>{ formatNum(pledge_amount, 8) }</div>
               <div className='detail-body-up-item-desc'>ADAM</div>
             </div>
           </div>

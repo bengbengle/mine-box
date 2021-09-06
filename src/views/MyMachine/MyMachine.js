@@ -134,10 +134,12 @@ const Index = ({ themeMode }) => {
     history.push('/addmachine')
   }
 
-  const formatNum = (num, dec = 4) => {
+  const formatNum = (num, precision = 0, dec = 4) => {
+    if(!num) return 0
     let x = new BigNumber(num);
-    let x_str = x.toFixed(dec);
-    return x_str
+    let x_div = x.dividedBy(10 ** precision)
+    let x_fixed = x_div.toFixed(dec);
+    return x_fixed
   }
 
   const clickDetailMachine = props => {
@@ -181,8 +183,6 @@ const Index = ({ themeMode }) => {
       setCurrentPage(page)
 
     }, 100);
-
-    
   }
 
   const getMachineList = async () => {
@@ -192,7 +192,6 @@ const Index = ({ themeMode }) => {
       'currentPage': currentPage.toString(),
       'pageSize': pageSize
     }
-
     const res = await req.post(url, data)
     const { rows, count } = res
     let tmp = []
@@ -217,6 +216,8 @@ const Index = ({ themeMode }) => {
     let totalPage = count / parseInt(pageSize)
     totalPage = Math.ceil(totalPage)
 
+    console.log('list:', list)
+    
     setMachineList(list)
     setTotalPage(totalPage)
     setCount(count)
@@ -243,7 +244,7 @@ const Index = ({ themeMode }) => {
         unit_desc: 'PIB'
       }, {
         title: 'Total pledge',
-        value: formatNum(total_adam), //res1 && res1.total_lock || 0,
+        value: formatNum(total_adam, 8), //res1 && res1.total_lock || 0,
         unit_desc: 'ADAM'
       }
     ]
@@ -261,53 +262,13 @@ const Index = ({ themeMode }) => {
     unit_desc: ''
   }]
 
-  // const handleScroll = event => {
-
-  //   let isToBottom = event.target.scrollTop + event.target.clientHeight - event.target.scrollHeight
-  //   console.log('isToBottom::', isToBottom, 'event:', event.target.scrollTop)
-
-  //   // 滚动的高度
-  //   // const scrollTop = (event.srcElement ? event.srcElement.documentElement.scrollTop : false) || window.pageYOffset || (event.srcElement ? event.srcElement.body.scrollTop : 0);
-  //   // var viewportSize = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
-
-  //   // const row_height = 173.5
-
-  //   // const top_h = 330
-  //   // const bottom_h = 60
-  //   // const rows_h = row_height * parseInt(pageSize) * currentPage
-  //   // const scroll_h = top_h + bottom_h + rows_h
-
-
-  //   // // set_scroll_h(scroll_h)
-  //   // // set_scrolltop(scrollTop + viewportSize)
-
-
-  //   // set_scrolltop(scroll_h);
-
-  //   // if (scrollTop + viewportSize > scroll_h && (machinelist && machinelist.length != count)) {
-  //   //   setCurrentPage(currentPage + 1)
-  //   // }
-  // }
-
-  const fetchMoreData = () => {
-    console.log('fetchMoreData')
-    setTimeout(() => {
-      let new_list = lists.concat(Array.from({length:20 }))
-      console.log('new_list', new_list)
-      setlists(new_list)
-    }, 1500);
-  };
-
   useEffect(() => {
     getPledgeInfo()
     setCurrentPage(1)
     getMachineList()
   }, [])
+ 
 
-  // useEffect(() => {
-  //   getMachineList()
-  // }, [currentPage, account])
-  
   const MyCardContent = ({ title, value, unit_desc, class_name }) => {
     return <div style={{ width: '50%' }}>
       <CardContent className={classes.cardContent}>
@@ -341,7 +302,6 @@ const Index = ({ themeMode }) => {
   )
 
   const AdamCard = ({ item, key }) => {
-    console.log('key::', key)
     const {
       total_profit,
       m_no,
@@ -359,13 +319,13 @@ const Index = ({ themeMode }) => {
             {machine_No(m_no)}
           </div>
           <div className='header-profit'>
-            {total_profit || '0.0000'}
+            {formatNum(total_profit, 8) || '0.0000'}
           </div>
         </div>
         <div className='card-body'>
           <div className='card-body-item'>
             <div className='card-body-item-label'>Pledge amount</div>
-            <div className='card-body-item-text'>{pledge_amount} ADAM </div>
+            <div className='card-body-item-text'>{ formatNum(pledge_amount, 8) } ADAM </div>
           </div>
           <div className='card-body-item'>
             <div className='card-body-item-label'>Pledge computing power</div>
@@ -404,20 +364,20 @@ const Index = ({ themeMode }) => {
         </div>
       </div>
       {
-        loading === true ? <div className={clsx(classes.loadingCls, 'loading')} ><RefreshIcon /></div> : 
-        machinelist.length == count && count == 0 && currentPage == 1  ?  <div className={classes.nodataCls}><NoDataIcon /></div>
-        : ''
+        loading === true ? <div className={clsx(classes.loadingCls, 'loading')} ><RefreshIcon /></div> :
+          machinelist.length == count && count == 0 && currentPage == 1 ? <div className={classes.nodataCls}><NoDataIcon /></div>
+            : ''
       }
       <InfiniteScroll
-          dataLength={machinelist.length}
-          next={getMoreMachineList}
-          hasMore={true}
-          loader={count != machinelist.length ? <h4 style={{display: 'flex', justifyContent: 'center'}}>Loading...</h4> :  ''}
-        >
-          {machinelist.map((item, index) => (
-            <AdamCard key={index} item={item} />
-          ))} 
-        </InfiniteScroll>
+        dataLength={machinelist.length}
+        next={getMoreMachineList}
+        hasMore={true}
+        loader={count != machinelist.length ? <h4 style={{ display: 'flex', justifyContent: 'center' }}>Loading...</h4> : ''}
+      >
+        {machinelist.map((item, key) => (
+          <AdamCard item={item} key={key} />
+        ))}
+      </InfiniteScroll>
     </div>
   );
 }

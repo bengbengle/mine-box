@@ -79,7 +79,10 @@ const Index = () => {
             setStatus('success')
             setopenAlert(true)
             
-            await getExtractableAmount(address)
+            setTimeout(() => {
+                getExtractableAmount(address)
+            }, 800)
+            
         } catch(ex) {
             setStatus('error')
             setopenAlert(true)
@@ -92,7 +95,7 @@ const Index = () => {
         return x_str
     }
     const getExtractableAmount = async (address) => {
-        const url = '/profit/getSendProfit'
+        const url = '/profit/getDrawSendProfit'
         const res = await req.post(url, { address: address })
         const amount = res && res.amount || 0
         console.log('res::', res)
