@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import { makeStyles } from '@material-ui/core/styles'
-import { Grid, Typography, TextField, Button, Divider } from '@material-ui/core'
-
+import { Grid, Button } from '@material-ui/core'
 import { useWallet } from '../../useWallet'
 import { request as req } from '../../req'
-
 import BigNumber from "bignumber.js";
 import IAlert from '../../components/IAlert'
+import CountUp from "react-countup";
 
 const useStyles = makeStyles(theme => ({
     icon: {
@@ -44,10 +43,6 @@ const useStyles = makeStyles(theme => ({
     margin20: {
         marginTop: '20px',
         marginBottom: '20px'
-    },
-    withdrawButton: {
-        // position: 'absolute',
-        bottom: '55px'
     },
     header: {
         fontSize: '1.2rem',
@@ -90,23 +85,19 @@ const Index = () => {
         const total_adam = res&& res.total_adam
         setExtractableAmount(total_adam)
     }
-
-    const handleOpenAlert = () => {
-        console.log('handleOpenAlert')
-    }
+ 
     useEffect(() => {
         getStakingAmount(account)
     }, [])
     return (
-        <div data-aos='fade-up'>
+        <div data-aos='fade-up' className='root-content'>
             <IAlert show={openAlert} setOpenAlert={setopenAlert} />
-
             <div className={classes.form}>
                 <Grid container spacing={2}>
                     <Grid item xs={12} className={classes.margin20}>
                         <div className='staking-box' >
                             <div className='number'>
-                                {formatNum(extractableAmount, 8)  || '0.0000'}
+                                <CountUp start={0} end={formatNum(extractableAmount, 8)} duration="1" decimal='.' decimals={4} separator=',' useGrouping="true" />
                             </div>
                             <div className='desc'>
                                 Extractable Pledge (ADAM)
@@ -117,9 +108,10 @@ const Index = () => {
                         The pledge will be withdrawn to the address <span className='address'>{shortAccount()}</span>,
                         please pay attention to check it
                     </div>
-                    <Grid item container className={classes.withdrawButton}>
+                    <Grid item container >
                         {extractableAmount ? <Button
                             fullWidth
+                            className={'bottomBox'}
                             variant="contained"
                             type="submit"
                             color="primary"
@@ -130,6 +122,7 @@ const Index = () => {
                         </Button>
                             :
                             <Button
+                            className={'bottomBox'}
                                 fullWidth
                                 variant="contained"
                                 type="submit"

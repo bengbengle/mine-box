@@ -27,13 +27,6 @@ const useStyles = makeStyles(theme => ({
     'text-align': 'center',
   },
   machineBody: {
-    width: '95%',
-    margin: '0px auto',
-    marginTop: '2rem',
-    margin: '0.8rem auto',
-    display: 'flex',
-    maxWidth: '1236px',
-    minWidth: '275px',
     '& .MuiTextField-root': {
       background: theme.palette.background.paper,
     },
@@ -131,8 +124,9 @@ const AddMachine = props => {
   // }
   
   const handlePledgeChange = async (val) => {
-    setPledgePower(val)
-    let adam_num = parseFloat(val) * 30
+    let v = val.replace(/^(0+)|[^\d]+/g,'')
+    setPledgePower(v)
+    let adam_num = parseFloat(v) * 30
     setAmount(adam_num)
   }
 
@@ -175,6 +169,7 @@ const AddMachine = props => {
   }
 
   const addMachine = async () => {
+    setTransactionStatus('confirm')
     const cycle = active == 0 ? 360 : active == 1 ? 540 : 1080
     try {
       const orderid = await req.post('miner/getOrderId')
@@ -198,7 +193,7 @@ const AddMachine = props => {
   }
   return (
     <div >
-      <div className={classes.machineBody}>
+      <div className={clsx('machine-content', classes.machineBody) }>
         <Grid container spacing={2}>
           <Grid item xs={12} >
             <Typography
@@ -316,27 +311,26 @@ const AddMachine = props => {
               <div className='cycle-item-title'>Pledge cycle</div>
               <div className='cycle-item-value'>1080 DAY</div>
             </div>
-           
           </Grid>
 
           <Grid item container xs={12} className='addmachineButton'>
             {
               (!poolCode || !minerNo || !devId || !pledgePower) ?
-                  <Button variant="contained" type="submit" size="large">  
+                  <Button variant="contained" type="submit" size="large" className={'bottomBox'}>  
                     Invalid pool code or machine id 
                   </Button>
                   :
               (
                 approvestatus == 'success' ?
-                (transactionStatus == 'confirm') && <Button variant="contained" type="submit" size="large"> Waiting Confirm... </Button>
-                || (transactionStatus == 'pending') && <Button variant="contained" type="submit" size="large"> Pending... </Button>
-                || (transactionStatus == '') && <Button variant="contained" type="submit" color="primary" size="large" onClick={addMachine}>
+                (transactionStatus == 'confirm') && <Button  className={'bottomBox'} variant="contained" type="submit" size="large"> Waiting Confirm... </Button>
+                || (transactionStatus == 'pending') && <Button  className={'bottomBox'} variant="contained" type="submit" size="large"> Pending... </Button>
+                || (transactionStatus == '') && <Button  className={'bottomBox'} variant="contained" type="submit" color="primary" size="large" onClick={addMachine}>
                   Staking Now
                 </Button>
                 || ''
-                : (approvestatus == 'confirm') && <Button variant="contained" type="submit" size="large"> Waiting Confirm... </Button>
-                || (approvestatus == 'pending') && <Button variant="contained" type="submit" size="large"> pending... </Button>
-                || <Button variant="contained" type="submit" size="large" color="primary" onClick={approve} >
+                : (approvestatus == 'confirm') && <Button  className={'bottomBox'} variant="contained" type="submit" size="large"> Waiting Confirm... </Button>
+                || (approvestatus == 'pending') && <Button  className={'bottomBox'} variant="contained" type="submit" size="large"> pending... </Button>
+                || <Button className={'bottomBox'} variant="contained" type="submit" size="large" color="primary" onClick={approve} >
                       {'Approve'}
                     </Button>
               )

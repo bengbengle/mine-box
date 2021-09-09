@@ -22,14 +22,14 @@ const useStyles = makeStyles(() => ({
   fontWeight900: {
     fontWeight: 900,
   },
-  cardBox: {
-    minWidth: 275,
-    background: '#303030',
-    margin: '0.8rem auto',
-    maxWidth: '1236px',
-    display: 'flex',
-    width: '95%'
-  },
+  // cardBox: {
+  //   minWidth: 275,
+  //   background: '#303030',
+  //   margin: '0.8rem auto',
+  //   maxWidth: '1236px',
+  //   display: 'flex',
+  //   width: '95%'
+  // },
   bullet: {
     display: 'inline-block',
     margin: '0 2px',
@@ -57,15 +57,6 @@ const useStyles = makeStyles(() => ({
     marginLeft: '5%',
     lineHeight: '45px'
   },
-  bottomBox: {
-    minWidth: 275,
-    background: '#303030',
-    margin: '0.8rem auto',
-    maxWidth: '1236px',
-    display: 'flex',
-    width: '95%',
-    marginBottom: '50px'
-  }
 }))
 
 const HelpIcon = props => <img src='/assets/help.png' style={{ width: '1rem', height: '1rem' }} />
@@ -130,8 +121,8 @@ const CardItem = ({ classes, title, value, unit_desc, has_help }) => {
               disableHoverListener
               disableTouchListener
               placement="bottom">
-              <IconButton onClick={handleTooltipOpen}>
-                <HelpIcon />
+              <IconButton onClick={handleTooltipOpen} style={{ padding: '10px!important' }}>
+                {/* <HelpIcon /> */}
               </IconButton>
             </Tooltip>
           </ClickAwayListener>
@@ -148,22 +139,22 @@ const CardItem = ({ classes, title, value, unit_desc, has_help }) => {
   </div>
 }
 
-const CardList = ({ classes, list }) => (
-  <Card className={classes.cardBox} >
-    {
-      list.map(({ title, value, unit_desc, has_help }, key) => (
-        <CardItem
-          key={key}
-          title={title}
-          value={value}
-          classes={classes}
-          has_help={has_help}
-          unit_desc={unit_desc}>
-        </CardItem>
-      ))
-    }
-  </Card>
-)
+// const CardList = ({ classes, list }) => (
+//   <Card className='cardBox' >
+//     {
+//       list.map(({ title, value, unit_desc, has_help }, key) => (
+//         <CardItem
+//           key={key}
+//           title={title}
+//           value={value}
+//           classes={classes}
+//           has_help={has_help}
+//           unit_desc={unit_desc}>
+//         </CardItem>
+//       ))
+//     }
+//   </Card>
+// )
 
 const Index = () => {
 
@@ -227,14 +218,14 @@ const Index = () => {
 
   return (
     <div data-aos='fade-up'>
-      <Card className={classes.cardBox} >
+      <Card className='cardBox' >
         <CardItem
           key={0}
           title={'Pledge Power'}
           value={formatNum(total_pledge_power) }
           classes={classes}
           has_help={true}
-          unit_desc={'PIB'}>
+          unit_desc={'T'}>
         </CardItem>
         <CardItem
           key={1}
@@ -245,14 +236,14 @@ const Index = () => {
           unit_desc={'ADAM'}>
         </CardItem>
       </Card>
-      <Card className={classes.cardBox} >
+      <Card className='cardBox' >
         <CardItem
           key={0}
-          title={'Expired'}
+          title={'Expired space'}
           value={formatNum(expired_power)}
           classes={classes}
           has_help={true}
-          unit_desc={'PIB'}>
+          unit_desc={'T'}>
         </CardItem>
         <CardItem
           key={1}
@@ -265,12 +256,12 @@ const Index = () => {
       </Card>
      
 
-      <Card className={classes.cardBox} style={{
+      <Card className='cardBox' style={{
         margin: '0px auto!important'
       }} >
         <Chart data={chart_data} className={classes.mychart}>
           <Title text={
-             <CountUp start={0} end={total_pledge_power } suffix=" P"  duration="1" decimal='.' decimals={4} separator=',' useGrouping="true" />
+             <CountUp start={0} end={total_pledge_power } suffix=" T"  duration="1" decimal='.' decimals={4} separator=',' useGrouping="true" />
           }/>
           <Palette scheme={colors} />
           <PieSeries innerRadius={0.5} outerRadius={0.7} valueField="val" argumentField="category" />
@@ -278,7 +269,7 @@ const Index = () => {
         </Chart>
       </Card>
 
-      <Card className={classes.bottomBox} >
+      <Card className={'bottomBox'} >
         <Button
           onClick={clickWithdrawButton}
           fullWidth

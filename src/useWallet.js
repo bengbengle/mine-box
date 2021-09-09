@@ -150,7 +150,7 @@ export const useWallet = () => {
                 }).on('error', error => {
                     setTransactionStatus('failed')
                     console.log('tx is failed ......', error)
-                }) 
+                })
 
                 resolve(tx)
             } catch (e) {

@@ -40,9 +40,11 @@ const Index = ({ themeMode, tabIndex, ...rest }) => {
       var web3 = await connect()
       web3.currentProvider.on('networkChanged', function (network) {
         setnetworkID(network)
+        window.location.reload()
       })
       web3.currentProvider.on('accountsChanged', function (account) {
         console.log('accounts_changed:', account)
+        window.location.reload()
       })
       let id = await web3.shh.net.getId()
       setnetworkID(id)

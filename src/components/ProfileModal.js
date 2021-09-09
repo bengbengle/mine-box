@@ -46,11 +46,17 @@ export default function Index({ show, handleCloseModal }) {
     const { set_pool_name } = useWallet()
 
     const handlePoolName = async e => {
+        console.log('poolName::', poolName)
+        if(!poolName) return
         setTransactionStatus('confirm')
         try {
             const tx = await set_pool_name(poolName)
             console.log(tx)
-            setTransactionStatus('success')
+            if(tx) {
+                setTransactionStatus('success')
+            } else {
+                setTransactionStatus('failed')
+            }
         } catch (e) {
             setTransactionStatus('failed')
         }

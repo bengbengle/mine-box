@@ -37,7 +37,7 @@ const Main = ({ children, themeToggler, themeMode, tabIndex, setTabIndex }) => {
         [classes.root]: true,
       })}
     >
-      <Topbar onSidebarOpen={handleSidebarOpen} themeMode={themeMode} themeToggler={themeToggler} />
+      <Topbar onSidebarOpen={handleSidebarOpen} themeMode={themeMode} themeToggler={themeToggler} open={isMd} tabIndex={tabIndex} setTabIndex={setTabIndex} />
       <Sidebar
         onClose={handleSidebarClose}
         open={open}
@@ -47,7 +47,7 @@ const Main = ({ children, themeToggler, themeMode, tabIndex, setTabIndex }) => {
         {children}
       </main>
 
-      <Footer tabIndex={tabIndex} setTabIndex={setTabIndex}  />
+      <Footer open={isMd} tabIndex={tabIndex} setTabIndex={setTabIndex}  />
     </div>
   );
 };

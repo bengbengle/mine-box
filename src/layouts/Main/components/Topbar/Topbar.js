@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
-import { makeStyles } from '@material-ui/core/styles'
+import { makeStyles, useTheme } from '@material-ui/core/styles';
 import { Toolbar, Button, IconButton } from '@material-ui/core'
 import { Image } from 'components/atoms'
 import { useWallet } from '../../../../useWallet'
-import Alert from '@material-ui/lab/Alert';
-import Collapse from '@material-ui/core/Collapse';
-import CloseIcon from '@material-ui/icons/Close';
+import { useMediaQuery, Divider } from '@material-ui/core';
+import { useHistory } from "react-router-dom";
 
 const useStyles = makeStyles(theme => ({
   flexGrow: {
@@ -89,9 +88,7 @@ const useStyles = makeStyles(theme => ({
     marginRight: '7px',
     display: 'flex'
   },
-  accountWallet: {
-    // 'margin-left': 'auto'
-  },
+   
   accountAddress: {
     'margin-left': 'auto',
     display: 'flex',
@@ -103,29 +100,25 @@ const useStyles = makeStyles(theme => ({
   }
 }))
 
-const OKEX_NETWORK_ID = 65
-const Topbar = ({ themeMode, themeToggler, onSidebarOpen, className, ...rest }) => {
+const Topbar = ({ themeMode, themeToggler, onSidebarOpen, className, open, setTabIndex, tabIndex, ...rest }) => {
 
+  console.log('top open::', !open)
   const classes = useStyles()
-
+  const history = useHistory();
   const [accountDisplay, setAccountDisplay] = useState('')
 
   const { connect, account } = useWallet()
-  const [networkID, setnetworkID] = useState(65)
+
+  const theme = useTheme();
+  const isMd = useMediaQuery(theme.breakpoints.up('md'), {
+    defaultMatches: true,
+  });
 
   const AccountIcon = props => <img src='/assets/pubkey.png' style={{ width: '1.5rem', height: '1.5rem' }} />
   const ExchangeIcon = props => <img src='/assets/exchange.png' style={{ width: '1rem', height: '1rem' }} />
 
   const shortAccount = async () => {
-    // var web3 = await connect()
-    // web3.currentProvider.on('networkChanged', function (network) {
-    //   console.log('network .. changed ...', network)
-    //   setnetworkID(network)
-    //   if(networkID == OKEX_NETWORK_ID) window.location.reload()
-    // })
-    // web3.shh.net.getId().then(id=>{
-    //   setnetworkID(id)
-    // })
+    
     if (!account) return ''
     let start = account.substr(0, 4)
     let end = account.substr(account.length - 4, 4)
@@ -137,26 +130,15 @@ const Topbar = ({ themeMode, themeToggler, onSidebarOpen, className, ...rest }) 
     shortAccount()
   }, [account, connect])
 
+  const MenuChangedHandle = idx => {
+    console.log('onchange...', idx)
+    setTabIndex(idx + '')
+    history.push('/')
+  }
  
 
   return (
     <Toolbar disableGutters className={classes.toolbar} {...rest}>
-      {/* <div className={'networkTips'} style={{ display: networkID != 65 ? 'block' : 'none' }}>
-        <Collapse in={networkID != 65} >
-          <Alert severity="error"
-            action={
-              <IconButton
-                aria-label="close"
-                color="inherit"
-                size="small"
-              >
-              </IconButton>
-            }
-          >
-            Network Error
-          </Alert>
-        </Collapse>
-      </div> */}
       <div className={classes.account}>
         <div className={classes.logoContainer}>
           <a href="/#/" title="Powerhub">
@@ -170,6 +152,13 @@ const Topbar = ({ themeMode, themeToggler, onSidebarOpen, className, ...rest }) 
         </div>
         {
           accountDisplay && <div className={classes.accountAddress}>
+            {
+              isMd ?  <ul className='menu'>
+                    <li className={tabIndex == '0' ? 'active' : '' } onClick={e=>MenuChangedHandle(0)}>Machine</li>
+                    <li className={tabIndex == '1' ? 'active' : '' } onClick={e=>MenuChangedHandle(1)} >Pledge</li>
+                    <li className={tabIndex == '2' ? 'active' : '' } onClick={e=>MenuChangedHandle(2)}>Profit</li>
+                </ul> : ''
+            }
             <div className={classes.accountIcon}>
               <AccountIcon />
             </div>
@@ -177,7 +166,7 @@ const Topbar = ({ themeMode, themeToggler, onSidebarOpen, className, ...rest }) 
           </div>
         }
         {
-          !accountDisplay && <div className={classes.accountWallet}>
+          !accountDisplay && <div>
             <Button
               onClick={e => connect()}
               variant="contained"
@@ -190,6 +179,7 @@ const Topbar = ({ themeMode, themeToggler, onSidebarOpen, className, ...rest }) 
             </Button>
           </div>
         }
+        
       </div>
     </Toolbar>
   )

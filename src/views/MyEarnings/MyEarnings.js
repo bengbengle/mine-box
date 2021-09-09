@@ -5,7 +5,6 @@ import {
   Chart,
   PieSeries,
   Title,
-  Tooltip,
   Legend
 } from "@devexpress/dx-react-chart-material-ui";
 import {
@@ -22,15 +21,7 @@ const useStyles = makeStyles(() => ({
   fontWeight900: {
     fontWeight: 900,
   },
-  cardBox: {
-    minWidth: 275,
-    background: '#303030',
-    // marginTop: '5%',
-    margin: '0.8rem auto',
-    maxWidth: '1236px',
-    display: 'flex',
-    width: '95%'
-  },
+ 
   bullet: {
     display: 'inline-block',
     margin: '0 2px',
@@ -58,15 +49,6 @@ const useStyles = makeStyles(() => ({
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center'
-  },
-  bottomBox: {
-    minWidth: 275,
-    background: '#303030',
-    margin: '0.8rem auto',
-    maxWidth: '1236px',
-    display: 'flex',
-    width: '95%',
-    marginBottom: '50px'
   }
 }));
 
@@ -195,7 +177,7 @@ const Index = ({ themeMode }) => {
   }
   const CardList = ({ list }) => (
 
-    <Card className={classes.cardBox} >
+    <Card className='cardBox' >
       {
         list.map(({ title, value, unit_desc }, key) => (
           <MyCardContent
@@ -223,7 +205,7 @@ const Index = ({ themeMode }) => {
       <CardList list={list}></CardList>
       <CardList list={list2}></CardList>
 
-      <Card className={classes.cardBox} >
+      <Card className='cardBox' >
         <Chart data={chartdata} style={{
           width: '90%',
           marginLeft: '5%',
@@ -242,7 +224,7 @@ const Index = ({ themeMode }) => {
           <Legend position="bottom" rootComponent={Root} itemComponent={Item} labelComponent={Label} />
         </Chart>
       </Card>
-      <Card className={classes.bottomBox} >
+      <Card className={'bottomBox'} >
         <Button
           onClick={clickWithdrawButton}
           fullWidth

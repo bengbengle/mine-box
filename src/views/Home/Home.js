@@ -13,14 +13,14 @@ const useStyles = makeStyles(() => ({
   fontWeight900: {
     fontWeight: 900,
   },
-  cardBox: {
-    minWidth: 275,
-    background: '#303030',
-    margin: '0.8rem auto',
-    maxWidth: '1236px',
-    display: 'flex',
-    width: '95%'
-  },
+  // cardBox: {
+  //   minWidth: 275,
+  //   background: '#303030',
+  //   margin: '0.8rem auto',
+  //   maxWidth: '1236px',
+  //   display: 'flex',
+  //   width: '95%'
+  // },
   bullet: {
     display: 'inline-block',
     margin: '0 2px',
@@ -110,7 +110,7 @@ const Index = ({  }) => {
   const list = [{
     title: 'Pledge Power',
     value: '232.3421',
-    unit_desc: 'PIB'
+    unit_desc: 'T'
   }, {
     title: 'Total pledge',
     value: '2000W',
@@ -119,7 +119,7 @@ const Index = ({  }) => {
   const list2 = [{
     title: 'Expired',
     value: '232.3421',
-    unit_desc: 'PIB'
+    unit_desc: 'T'
   }, {
     title: 'Extracted',
     value: '2000W',
@@ -144,7 +144,7 @@ const Index = ({  }) => {
 
   const CardList = ({list}) => (
 
-    <Card className={classes.cardBox} data-aos='fade-up'> 
+    <Card className='cardBox' data-aos='fade-up'> 
     {
       list.map(({ title, value, unit_desc }, key) => (
         <MyCardContent
@@ -162,8 +162,7 @@ const Index = ({  }) => {
     <div>
       <CardList list={list}></CardList>
       <CardList list={list2}></CardList>
-      <Card className={classes.cardBox} data-aos='fade-up'>
-        
+      <Card className='cardBox' data-aos='fade-up'> 
         <Chart data={chart_data} style={{
           width: '96%',
           marginTop: '5%',

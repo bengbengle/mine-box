@@ -4,6 +4,7 @@ import { Grid, Typography, TextField, Button, Divider } from '@material-ui/core'
 import BigNumber from "bignumber.js";
 import { useWallet } from '../../useWallet'
 import { request as req } from '../../req'
+import CountUp from "react-countup";
 
 import IAlert from '../../components/IAlert'
 
@@ -23,6 +24,7 @@ const useStyles = makeStyles(theme => ({
         display: 'flex',
         maxWidth: '1236px',
         minWidth: '275px',
+        
         'border-radius': '30px',
         '& .MuiTextField-root': {
             'border-radius': '30px',
@@ -47,10 +49,6 @@ const useStyles = makeStyles(theme => ({
     margin20: {
         marginTop: '20px',
         marginBottom: '20px'
-    },
-    withdrawButton: {
-        // position: 'absolute',
-        bottom: '55px'
     },
     header: {
         fontSize: '1.2rem',
@@ -107,7 +105,7 @@ const Index = () => {
     }, [])
 
     return (
-        <div data-aos='fade-up'>
+        <div data-aos='fade-up' className='root-content'>
             <IAlert show={openAlert} setOpenAlert={setopenAlert} status={status} />
 
             <div className={classes.form}>
@@ -115,7 +113,8 @@ const Index = () => {
                     <Grid item xs={12} className={classes.margin20}>
                         <div className='staking-box' >
                             <div className='number'>
-                                {formatNum(extractableAmount) || '0.0000' }
+                                {/* {formatNum(extractableAmount) || '0.0000' } */}
+                                <CountUp start={0} end={extractableAmount} duration="1" decimal='.' decimals={4} separator=',' useGrouping="true" />
                             </div>
                             <div className='desc'>
                                 Extractable Earn (ADAM)
@@ -127,7 +126,7 @@ const Index = () => {
                         Your profit will be withdraw to the address <span className='address'>{shortAccount()}</span>,
                         please pay attention to check it
                     </div>
-                    <Grid item container className={classes.withdrawButton}>
+                    <Grid item container >
                         {extractableAmount ? <Button
                             onClick={e => withdrawAll(account)}
                             fullWidth
@@ -135,8 +134,9 @@ const Index = () => {
                             type="submit"
                             color="primary"
                             size="large"
+                            className='bottomBox'
                         > Withdraw </Button> :
-                            <Button fullWidth variant="contained" type="submit" size="large"> Withdraw </Button>
+                            <Button fullWidth variant="contained" type="submit" size="large" className='bottomBox'> Withdraw </Button>
                         }
                     </Grid>
                 </Grid>

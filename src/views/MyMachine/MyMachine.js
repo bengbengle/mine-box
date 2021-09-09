@@ -16,18 +16,10 @@ const useStyles = makeStyles(() => ({
   },
   cardBox: {
     minWidth: 275,
-    background: '#303030',
     margin: '0.8rem auto',
     maxWidth: '1236px',
     display: 'flex',
     width: '95%'
-  },
-  cardBox1: {
-    height: '100px',
-    display: 'flex',
-    justifyContent: 'center',
-    padding: '10px',
-    'flex-direction': 'column'
   },
   bullet: {
     display: 'inline-block',
@@ -57,16 +49,16 @@ const useStyles = makeStyles(() => ({
     justifyContent: 'center',
     alignItems: 'center'
   },
-  account: {
-    display: 'flex',
-    flexDirection: 'row',
-    margin: '0.8rem auto',
-    alignItems: 'center',
-    width: '95%',
-    padding: '0px 12px',
-    maxWidth: '1236px',
-    minWidth: '275px',
-  },
+  // account: {
+  //   display: 'flex',
+  //   flexDirection: 'row',
+  //   margin: '0.8rem auto',
+  //   alignItems: 'center',
+  //   width: '95%',
+  //   padding: '0px 12px',
+  //   maxWidth: '1236px',
+  //   minWidth: '275px',
+  // },
   accountIcon: {
     marginRight: '7px',
   },
@@ -110,7 +102,7 @@ const RefreshIcon = props => <img src='/assets/refresh.png' />
 const NoDataIcon = props => <img src='/assets/nodata.png' style={{ width: '50%', maxWidth: '200px' }} />
 
 const pageSize = '5'
-const selltoken = '0xcd28d5353c6612f76ada912a83f5c7107b1ecd4c'  // adam
+const selltoken = '0xdde077002982956DF24E23E3f3743BA5e56929fe'  // adam
 const buytoken = '0x55d398326f99059ff775485246999027b3197955'   // usdt
 const dodoBaseUrl = 'https://bsc.api.0x.org/swap/v1/price'
 
@@ -125,7 +117,7 @@ const Index = ({ themeMode }) => {
       {
         title: 'Pledge Power',
         value: '...',
-        unit_desc: 'PIB'
+        unit_desc: 'T'
       }, {
         title: 'Total pledge',
         value: '...', //res1 && res1.total_lock || 0,
@@ -259,17 +251,17 @@ const Index = ({ themeMode }) => {
     const res2 = await req.post(url2, { address: account })
      
     
-    const total_pledge = res1 && res2.total_pledge || 0
-    const total_adam = res2 && res2.total_adam || 0
+    const all_profit = res1 && res1.all_profit || 0
+    const all_pledge = res2 && res2.all_pledge || 0
 
     let tmp = [
       {
-        title: 'Pledge Power',
-        value: formatNum(total_pledge),
-        unit_desc: 'PIB'
+        title: 'Total network power',
+        value: formatNum(all_pledge),
+        unit_desc: 'T'
       }, {
-        title: 'Total pledge',
-        value: formatNum(total_adam, 8),
+        title: 'Total network profit',
+        value: formatNum(all_profit),
         unit_desc: 'ADAM'
       }
     ]
@@ -310,10 +302,9 @@ const Index = ({ themeMode }) => {
         </Typography>
         <Typography className={clsx(classes.value, class_name)} variant="h5" component="h2">
           {
-            unit_desc == 'Estimated rate' ? value : 
+            title == 'Estimated rate' ? value : 
             <CountUp start={0} end={value} duration="1" decimal='.' decimals={4} separator=',' useGrouping="true" />
           }
-          {/* <CountUp start={0} end={value} duration="1" decimal='.' decimals={4} separator=',' useGrouping="true" /> */}
         </Typography>
         <Typography className={classes.unit_desc} color="textSecondary" >
           {unit_desc}
@@ -323,7 +314,7 @@ const Index = ({ themeMode }) => {
   }
 
   const CardList = ({ list }) => (
-    <Card className={classes.cardBox} >
+    <Card className='cardBox' >
       {
         list && list.map(({ title, value, unit_desc, className }, key) => (
           <MyCardContent
@@ -385,7 +376,7 @@ const Index = ({ themeMode }) => {
 
       <CardList list={priceInfo}></CardList>
 
-      <div className={classes.account}>
+      <div className='account-content'>
         <div className={classes.groupTitle}>
           Mining machine
         </div>

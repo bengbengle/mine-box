@@ -1,13 +1,12 @@
 import React, { useEffect } from 'react';
 import { useHistory } from "react-router-dom";
 import PropTypes from 'prop-types';
-// import clsx from 'clsx';
 import { makeStyles } from '@material-ui/core/styles';
 import {
   BottomNavigation,
   BottomNavigationAction
 } from '@material-ui/core';
- 
+
 const useStyles = makeStyles(theme => ({
   root: {
     width: '100%',
@@ -28,29 +27,37 @@ const Tab1Active = () => <img src='/assets/tab1-active.png' width='28px' height=
 const Tab2Active = () => <img src='/assets/tab2-active.png' width='28px' height='28px' />
 const Tab3Active = () => <img src='/assets/tab3-active.png' width='28px' height='28px' />
 
-
-
-const Footer = ({ tabIndex, setTabIndex }) => {
+const Footer = ({ tabIndex, setTabIndex, open }) => {
   const history = useHistory();
   const classes = useStyles();
   console.log('value:', tabIndex);
-  
+
   return (
-    <BottomNavigation
-      value={tabIndex}
-      onChange={(event, newValue) => {
-        if(tabIndex == newValue && history.location.pathname == '/') return false;
-        console.log('onchange...', newValue)
-        setTabIndex(newValue + '')
-        history.push('/')
-      }}
-      showLabels
-      className={classes.root}
-    >
-      <BottomNavigationAction label="Machine" icon={tabIndex == '0' ? <Tab1Active /> : <Tab1 />} />
-      <BottomNavigationAction label="Pledge" icon={tabIndex == '1' ? <Tab2Active /> : <Tab2 />} />
-      <BottomNavigationAction label="Profit" icon={tabIndex == '2' ? <Tab3Active /> : <Tab3 />} />
-    </BottomNavigation>
+    <>
+      <BottomNavigation
+        style={{ display: !open ? 'flex' : 'none' }}
+        value={tabIndex}
+        onChange={(event, newValue) => {
+          if (tabIndex == newValue && history.location.pathname == '/') return false;
+          console.log('onchange...', newValue)
+          setTabIndex(newValue + '')
+          history.push('/')
+        }}
+        showLabels
+        className={classes.root}
+      >
+        <BottomNavigationAction label="Machine" icon={tabIndex == '0' ? <Tab1Active /> : <Tab1 />} />
+        <BottomNavigationAction label="Pledge" icon={tabIndex == '1' ? <Tab2Active /> : <Tab2 />} />
+        <BottomNavigationAction label="Profit" icon={tabIndex == '2' ? <Tab3Active /> : <Tab3 />} />
+      </BottomNavigation>
+      <div className='copyright' style={{
+        display: open ? 'flex' : 'none'
+      }}>
+        <div className='content' >
+          Copyright © ADAMoracle Project All Rights Reserved
+        </div>
+      </div>
+    </>
   )
 }
 Footer.propTypes = {
