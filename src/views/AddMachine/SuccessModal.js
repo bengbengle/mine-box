@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Button from "@material-ui/core/Button";
 import Dialog from "@material-ui/core/Dialog";
 import DialogContent from "@material-ui/core/DialogContent";
@@ -18,17 +18,8 @@ const SuccessIcon = () => <img src='/assets/success.png' style={{
 
 
 export default function AlertDialogSlide({ show, handleCloseModal }) {
-
-    // console.log('show::', show, 'handleCloseModal:', handleCloseModal)
-
     return (
         <div>
-            {
-                /* <Button variant="outlined" color="primary" onClick={handleClickOpen}>
-                        Slide in alert dialog
-                    </Button> 
-                */
-            }
             <Dialog
                 open={show}
                 TransitionComponent={Transition}

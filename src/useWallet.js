@@ -5,16 +5,16 @@ import { useWeb3React } from '@web3-react/core'
 import contract_abi from './abi/contract.json'
 import adam_abi from './abi/adam.json'
 
-const miner_address = '0xdaFbb2FA0559D7DD17C6400979041cfE3cefE865'
-const adam_address = '0xD91B0A418Aea5bCc75d6bFD272C31AFE9D7cAa9c'
+// const miner_address = '0xdaFbb2FA0559D7DD17C6400979041cfE3cefE865'
+// const adam_address = '0xD91B0A418Aea5bCc75d6bFD272C31AFE9D7cAa9c'
+
+const miner_address = '0xee2dA6e2d8Ef8e76A44388f517549aE8789498a3'
+const adam_address = '0x3B27116E262C05164FE1dFE7b54f2cc3FbBb4539'
 
 export const useWallet = () => {
 
     const acc = localStorage.getItem('acc')
     const [account, setLocalAccount] = useState(acc || '')
-
-    // const [txStatus, setTxStatus] = useState([])
-   
 
     const connectWallet = () => {
         return new Promise(async (resolve, reject) => {
@@ -87,19 +87,6 @@ export const useWallet = () => {
         const mine_contract = new web3.eth.Contract(contract_abi, miner_address)
         return mine_contract
     }
-
-    // const get_pledgeinfo = async () => {
-    //     const my_contract = await get_contract()
-    //     const pledge_info = await my_contract.methods.getPledgeInfo()
-
-    //     const info = await pledge_info.call({ from: account })
-    //     return {
-    //         total_pledge_adam: info[0],
-    //         total_pledge_power: info[1],
-    //         total_pledge_withdraw: info[2]
-    //     }
-    // }
-
     const set_pool_name = async (poolname) => {
         try {
             const my_contract = await get_contract()
@@ -117,6 +104,17 @@ export const useWallet = () => {
             const poolname = await tx.call({ from: account })
             console.log('poolname::', poolname)
             return poolname
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
+    const availPledage = async ({power}) => {
+        try {
+            const my_contract = await get_contract()
+            const tx = await my_contract.methods.availPledage(power)
+            const availble = await tx.call({ from: account })
+            return availble
         } catch (e) {
             console.log(e)
         }
@@ -209,7 +207,7 @@ export const useWallet = () => {
         connect,
         connectWallet,
         get_contract,
-        // get_pledgeinfo,
+        availPledage,
         set_pool_name,
         get_pool_name,
         add_machine,

@@ -186,17 +186,13 @@ const Index = () => {
     set_expired_power(res && res.total_date || 0) // 已到期
     set_extracted_adam(res && res.total_draw || 0) // 已提取
 
-    let all_pledge = res && res.all_pledge || 0
+    let all_pledge = res && res.all_pledge || 1
     let total_pledge = res && res.total_pledge || 0
      
     set_chart_data([
         { category: "Total Pledge", val: (parseFloat(all_pledge)  - parseFloat(total_pledge)) },
         { category: "My Pledge", val: total_pledge }
     ])
-
-
-  
-
   }
 
   const formatNum = (num, precision = 0, dec = 4) => {

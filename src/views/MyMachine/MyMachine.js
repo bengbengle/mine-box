@@ -213,6 +213,8 @@ const Index = ({ themeMode }) => {
       'pageSize': pageSize
     }
     const res = await req.post(url, data)
+    console.log('res::', res)
+    
     const { rows, count } = res
     let tmp = []
     if (currentPage == 1) {

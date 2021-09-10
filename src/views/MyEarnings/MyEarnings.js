@@ -124,7 +124,7 @@ const Index = ({ themeMode }) => {
     setMinerTimes(res && res.miner_count || 0)
 
 
-    let all_profit = res && res.all_profit || 0
+    let all_profit = res && res.all_profit || 1
     let my_profit = res && res.total_profit || 0
 
     console.log('all_profit:', all_profit)

@@ -60,12 +60,11 @@ const HelpIcon = () => <img src='/assets/help.png' style={{ marginLeft: '10px', 
 
 const AddMachine = props => {
   const classes = useStyles();
-  const { add_machine, approval, get_allowance, connectWallet } = useWallet()
+  const { add_machine, approval, get_allowance, connectWallet, availPledage } = useWallet()
 
   const [active, setActive] = useState(0)
   const [totalPower, setTotalPower] = useState(0)
   const [availabelPower, setAvailabelPower] = useState(0)
-  // const [orderId, setOrderId] = useState('')
   const [minerNo, setMinerNo] = useState('')
 
   const [success, setSuccess] = useState(false)
@@ -80,7 +79,9 @@ const AddMachine = props => {
   // device id
   const [devId, setDevId] = useState('')
   // const tmpdevId = 'ec24c456-b7cd-6aa9-eb33-e2cc89b3228c'
-
+  
+  // device id
+  const [forbidden, setForbidden] = useState(0)
 
   const [pledgePower, setPledgePower] = useState(1)
 
@@ -116,18 +117,15 @@ const AddMachine = props => {
         }
       )
   }
-
-  // const handleAmountChange = async (val) => {
-  //   setAmount(val)
-  //   let pledge = parseFloat(val) / 30
-  //   setPledgePower(pledge)
-  // }
+ 
   
   const handlePledgeChange = async (val) => {
     let v = val.replace(/^(0+)|[^\d]+/g,'')
     setPledgePower(v)
     let adam_num = parseFloat(v) * 30
     setAmount(adam_num)
+
+    await get_avail_pledage({power: v})
   }
 
   const handleCloseModal = () => {
@@ -147,10 +145,15 @@ const AddMachine = props => {
     setPoolCode(val)
   }
 
+  const get_avail_pledage = async ({power}) => {
+    let val = await availPledage({power})
+    console.log('availPledage::', val)
+    setForbidden(val)
+  }
+
   useEffect(() => {
     getAllowance()
-    // handleDeviceChanged('1630654290414CC0BD8F9600CAA3D')
-    // handlePoolCodeChanged('M16306542038578956B89ED873C9DF')
+    // get_avail_pledage()
   }, [])
 
   useEffect(() => {
@@ -177,14 +180,14 @@ const AddMachine = props => {
 
       const web3 = await connectWallet()
       let amount_wei = web3.utils.toWei((amount * 100).toString(), 'mwei')
-      // let amount_wei = amount
-      // console.log('amount_wei:', amount_wei)
+      
       console.log({ cycle, minerNo, orderId: orderid, devId: devId, poolCode, amount: amount_wei, pledgePower, setTransactionStatus })
 
       const tx = await add_machine({ cycle, minerNo, orderId: orderid, devId: devId, poolCode, amount: amount_wei, pledgePower, setTransactionStatus })
       
       console.log('tx::', tx)
       getMinerInfo(devId)
+      // get_avail_pledage()
 
     } catch (e) {
       setTransactionStatus('fails')
@@ -220,7 +223,6 @@ const AddMachine = props => {
               variant="subtitle1"
               color="textPrimary"
               className={classes.inputTitle}
-
             >
               Machine ID
             </Typography>
@@ -273,8 +275,7 @@ const AddMachine = props => {
               color="textPrimary"
               className={classes.inputTitle}
             >
-              Pledge
-
+              Pledge 
             </Typography>
             <span className='subtitle5'>
               (1T Storage Power needs to pledge 30 ADAM)
@@ -312,27 +313,38 @@ const AddMachine = props => {
               <div className='cycle-item-value'>1080 DAY</div>
             </div>
           </Grid>
-
+          
           <Grid item container xs={12} className='addmachineButton'>
             {
-              (!poolCode || !minerNo || !devId || !pledgePower) ?
+              forbidden == 1 ?  
+              <Button variant="contained" type="submit" size="large" className={'bottomBox'}>  
+                Number of new spaces waiting to be opened
+              </Button>
+              : 
+              (parseFloat(availabelPower) < parseFloat(pledgePower)) ? 
+                <Button variant="contained" type="submit" size="large" className={'bottomBox'}>  
+                  Not enough availabel power
+                </Button> :
+              (
+                (!poolCode || !minerNo || !devId || !pledgePower  ) ?
                   <Button variant="contained" type="submit" size="large" className={'bottomBox'}>  
-                    Invalid pool code or machine id 
+                    Invalid pool code or machine id  
                   </Button>
                   :
-              (
-                approvestatus == 'success' ?
-                (transactionStatus == 'confirm') && <Button  className={'bottomBox'} variant="contained" type="submit" size="large"> Waiting Confirm... </Button>
-                || (transactionStatus == 'pending') && <Button  className={'bottomBox'} variant="contained" type="submit" size="large"> Pending... </Button>
-                || (transactionStatus == '') && <Button  className={'bottomBox'} variant="contained" type="submit" color="primary" size="large" onClick={addMachine}>
-                  Staking Now
-                </Button>
-                || ''
-                : (approvestatus == 'confirm') && <Button  className={'bottomBox'} variant="contained" type="submit" size="large"> Waiting Confirm... </Button>
-                || (approvestatus == 'pending') && <Button  className={'bottomBox'} variant="contained" type="submit" size="large"> pending... </Button>
-                || <Button className={'bottomBox'} variant="contained" type="submit" size="large" color="primary" onClick={approve} >
-                      {'Approve'}
+                  (
+                    approvestatus == 'success' ?
+                    (transactionStatus == 'confirm') && <Button  className={'bottomBox'} variant="contained" type="submit" size="large"> Waiting Confirm... </Button>
+                    || (transactionStatus == 'pending') && <Button  className={'bottomBox'} variant="contained" type="submit" size="large"> Pending... </Button>
+                    || (transactionStatus == '') && <Button  className={'bottomBox'} variant="contained" type="submit" color="primary" size="large" onClick={addMachine}>
+                      Staking Now
                     </Button>
+                    || ''
+                    : (approvestatus == 'confirm') && <Button  className={'bottomBox'} variant="contained" type="submit" size="large"> Waiting Confirm... </Button>
+                    || (approvestatus == 'pending') && <Button  className={'bottomBox'} variant="contained" type="submit" size="large"> pending... </Button>
+                    || <Button className={'bottomBox'} variant="contained" type="submit" size="large" color="primary" onClick={approve} >
+                          {'Approve'}
+                        </Button>
+                  )
               )
             }
           </Grid>

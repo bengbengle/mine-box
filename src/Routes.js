@@ -26,7 +26,7 @@ import {
 
 import ProfileModal from './components/ProfileModal'
 import { useWallet } from './useWallet'
-const OKEX_NETWORK_ID = 65
+const OKEX_NETWORK_ID = 97
 const Index = ({ themeMode, tabIndex, ...rest }) => {
 
   const [showModal, setShowModal] = useState(false)
@@ -94,8 +94,8 @@ const Index = ({ themeMode, tabIndex, ...rest }) => {
             <MyStaking themeMode={themeMode} tabIndex={tabIndex} {...rest} /> :
             <MyEarnings themeMode={themeMode} tabIndex={tabIndex} {...rest} />
       }
-      <div className='networkTips' style={{ display: networkID != 65 ? 'block' : 'none' }}>
-        <Collapse in={networkID != 65} style={{ width: '100%' }} >
+      <div className='networkTips' style={{ display: networkID != OKEX_NETWORK_ID ? 'block' : 'none' }}>
+        <Collapse in={networkID != OKEX_NETWORK_ID} style={{ width: '100%' }} >
           <Alert severity="error"
             action={
               <IconButton

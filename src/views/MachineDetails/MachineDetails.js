@@ -31,22 +31,13 @@ const MachineDetails = ({location}) => {
   const history = useHistory();
   const [times, setTimes] = useState(0)
   
-  const classes = useStyles()
+  // const classes = useStyles()
 
   const { state } = location
 
   console.log('state:', state)
 
   const { serial_number, pledge_power, m_no, pledge_amount, profit  } = state
-  // address: "0xa8E7813150a988e7F20193983fA3017155F3C162"
-  // amount: "30"
-  // create_time: "2021-08-12 19:52:17"
-  // m_no: "M1628750275558C94034F0631E7410"
-  // pledge_amount: "30"
-  // pledge_power: "1"
-  // pool_code: "p12345678"
-  // serial_number: "ec24c456-b7cd-6aa9-eb33-e2cc89b32210"
-  // update_time: "2021-08-12 21:27:30"
 
   const getMinerTimes = async () => {
       {
