@@ -146,7 +146,7 @@ const Index = ({ themeMode }) => {
   const clickAddMachine = () => history.push('/addmachine')
 
   const formatNum = (num, precision = 0, dec = 4) => {
-    if(!num) return 0
+    if (!num) return 0
     let x = new BigNumber(num);
     let x_div = x.dividedBy(10 ** precision)
     let x_fixed = x_div.toFixed(dec);
@@ -197,7 +197,7 @@ const Index = ({ themeMode }) => {
         list[idx].profit = profit
         list[idx].total_profit = profit
       }
-      
+
       list = machinelist.concat(rows)
       console.log('lists:', list)
       setMachineList(list)
@@ -214,7 +214,7 @@ const Index = ({ themeMode }) => {
     }
     const res = await req.post(url, data)
     console.log('res::', res)
-    
+
     const { rows, count } = res
     let tmp = []
     if (currentPage == 1) {
@@ -237,7 +237,7 @@ const Index = ({ themeMode }) => {
       list[idx].total_profit = profit
     }
     console.log('list:', list)
-    
+
     setMachineList(list)
     setCount(count)
     setLoading(false)
@@ -245,14 +245,14 @@ const Index = ({ themeMode }) => {
 
   // 质押信息
   const getPledgeInfo = async () => {
- 
+
     const url1 = '/profit/getUserProfit'
     const res1 = await req.post(url1, { address: account })
 
     const url2 = '/miner/getUserPledge'
     const res2 = await req.post(url2, { address: account })
-     
-    
+
+
     const all_profit = res1 && res1.all_profit || 0
     const all_pledge = res2 && res2.all_pledge || 0
 
@@ -270,12 +270,12 @@ const Index = ({ themeMode }) => {
     setPledgeInfo(tmp)
 
 
-    
+
     let url_price = `${dodoBaseUrl}?sellToken=${selltoken}&buyToken=${buytoken}&sellAmount=10000000`
 
     let res_price = await axios.get(url_price)
     let price = res_price.data.price
-    
+
     let price_info = [{
       title: 'ADAM current price',
       value: formatNum(price),
@@ -295,7 +295,7 @@ const Index = ({ themeMode }) => {
     setCurrentPage(1)
     getMachineList()
   }, [])
- 
+
   const MyCardContent = ({ title, value, unit_desc, class_name }) => {
     return <div style={{ width: '50%' }}>
       <CardContent className={classes.cardContent}>
@@ -304,8 +304,8 @@ const Index = ({ themeMode }) => {
         </Typography>
         <Typography className={clsx(classes.value, class_name)} variant="h5" component="h2">
           {
-            title == 'Estimated rate' ? value : 
-            <CountUp start={0} end={value} duration="1" decimal='.' decimals={4} separator=',' useGrouping="true" />
+            title == 'Estimated rate' ? value :
+              <CountUp start={0} end={value} duration="1" decimal='.' decimals={4} separator=',' useGrouping="true" />
           }
         </Typography>
         <Typography className={classes.unit_desc} color="textSecondary" >
@@ -356,7 +356,7 @@ const Index = ({ themeMode }) => {
         <div className='card-body'>
           <div className='card-body-item'>
             <div className='card-body-item-label'>Pledge amount</div>
-            <div className='card-body-item-text'>{ formatNum(pledge_amount, 8) } ADAM </div>
+            <div className='card-body-item-text'>{formatNum(pledge_amount, 8)} ADAM </div>
           </div>
           <div className='card-body-item'>
             <div className='card-body-item-label'>Pledge computing power</div>
@@ -397,7 +397,7 @@ const Index = ({ themeMode }) => {
       </div>
       {
         loading === true ? <div className={clsx(classes.loadingCls, 'loading')} ><RefreshIcon /></div> :
-        loading === false && machinelist.length == count && count == 0 && currentPage == 1 ? <div className={classes.nodataCls}><NoDataIcon /></div>
+          loading === false && machinelist.length == count && count == 0 && currentPage == 1 ? <div className={classes.nodataCls}><NoDataIcon /></div>
             : ''
       }
       <InfiniteScroll

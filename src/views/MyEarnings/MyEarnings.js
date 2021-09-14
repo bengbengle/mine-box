@@ -5,7 +5,11 @@ import {
   Chart,
   PieSeries,
   Title,
-  Legend
+  Legend,
+  BarSeries,
+  ArgumentAxis,
+  ValueAxis,
+  Tooltip,
 } from "@devexpress/dx-react-chart-material-ui";
 import {
   Palette,
@@ -61,15 +65,15 @@ const legendStyles = () => ({
   },
 })
 
-const legendLabelStyles = theme => ({
+const legendLabelStyles = () => ({
   label: {
     whiteSpace: 'nowrap',
   },
 })
 const legendItemStyles = () => ({
   item: {
-    flexDirection: 'row',
-  },
+    flexDirection: 'row'
+  }
 })
 
 const legendRootBase = ({ classes, ...restProps }) => (
@@ -82,15 +86,11 @@ const legendItemBase = ({ classes, ...restProps }) => (
   <Legend.Item className={classes.item} {...restProps} />
 )
 
-
 const Root = withStyles(legendStyles, { name: 'LegendRoot' })(legendRootBase)
 const Label = withStyles(legendLabelStyles, { name: 'LegendLabel' })(legendLabelBase)
 const Item = withStyles(legendItemStyles, { name: 'LegendItem' })(legendItemBase)
 
-
-
 const Index = ({ themeMode }) => {
-  const [tips, setTips] = useState(null);
 
   const [totalProfit, setTotalProfit] = useState(0); // 总收益
   const [totalRelease, setTotalRelease] = useState(0); // 总释放
@@ -214,14 +214,15 @@ const Index = ({ themeMode }) => {
           margin: '10px auto',
         }}>
           <Title text={ 
-            // formatNum(chartdata[1].val) + ' ADAM ' 
            <CountUp start={0} end={chartdata[1].val } suffix=" ADAM"  duration="1" decimal='.' decimals={4} separator=',' useGrouping="true" />
-           
         }  className={classes.chartTitle} />
           <Palette scheme={chart_scheme} />
           <PieSeries innerRadius={0.5} outerRadius={0.7} valueField="val" argumentField="category" />
-          <EventTracker onClick={clickTooltip} />
-          <Legend position="bottom" rootComponent={Root} itemComponent={Item} labelComponent={Label} />
+          {/* <EventTracker onClick={clickTooltip} />
+          <Legend position="bottom" rootComponent={Root} itemComponent={Item} labelComponent={Label} /> */}
+          
+          <EventTracker />
+          {/* <Tooltip /> */}
         </Chart>
       </Card>
       <Card className={'bottomBox'} >

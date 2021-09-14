@@ -53,7 +53,6 @@ const useStyles = makeStyles(() => ({
   },
   mychart: {
     width: '96%',
-    // marginTop: '5%',
     marginLeft: '5%',
     lineHeight: '45px'
   },
@@ -129,7 +128,6 @@ const CardItem = ({ classes, title, value, unit_desc, has_help }) => {
         }
       </Typography>
       <Typography className={classes.value} variant="h5" component="h2">
-        {/* {value} */}
         <CountUp start={0} end={value} duration="1" decimal='.' decimals={4} separator=',' useGrouping="true" />
       </Typography>
       <Typography className={classes.unit_desc} color="textSecondary" >
@@ -250,7 +248,6 @@ const Index = () => {
           unit_desc={'ADAM'}>
         </CardItem>
       </Card>
-     
 
       <Card className='cardBox' style={{
         margin: '0px auto!important'

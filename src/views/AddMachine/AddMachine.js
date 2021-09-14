@@ -7,6 +7,7 @@ import { useWallet } from '../../useWallet'
 import { request as req } from '../../req'
 import SuccessModal from './SuccessModal'
 import FailedModal from './FailedModal'
+import LoadingModal from './LoadingModal'
 import clsx from 'clsx';
 import BigNumber from "bignumber.js";
 
@@ -57,6 +58,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const HelpIcon = () => <img src='/assets/help.png' style={{ marginLeft: '10px', width: '1rem', height: '1rem' }} />
+const RefreshIcon = props => <img src='/assets/refresh.png' />
 
 const AddMachine = props => {
   const classes = useStyles();
@@ -69,6 +71,7 @@ const AddMachine = props => {
 
   const [success, setSuccess] = useState(false)
   const [failed, setFailed] = useState(false)
+  const [loading, setloading] = useState(false)
 
   const [amount, setAmount] = useState(30)
 
@@ -76,14 +79,12 @@ const AddMachine = props => {
   const [transactionStatus, setTransactionStatus] = useState('') // '' 、confirm 、pengding 、success 、fails  
 
   const [poolCode, setPoolCode] = useState('')
-  // device id
   const [devId, setDevId] = useState('')
-  // const tmpdevId = 'ec24c456-b7cd-6aa9-eb33-e2cc89b3228c'
-  
+
   // device id
   const [forbidden, setForbidden] = useState(0)
 
-  const [pledgePower, setPledgePower] = useState(1)
+  const [pledgePower, setPledgePower] = useState(0)
 
   // 获取算力 
   const getMinerInfo = async (id) => {
@@ -131,8 +132,18 @@ const AddMachine = props => {
   const handleCloseModal = () => {
     setSuccess(false)
     setFailed(false)
+    setloading(false)
+
     setTransactionStatus('')
+    setPledgePower(0)
+
   }
+  const handleCloseLoadingModal = () => {
+    // setSuccess(false)
+    // setFailed(false)
+    // setTransactionStatus('')
+  }
+
   // device Id changed
   const handleDeviceChanged = async (id) => {
     console.log('id::', id)
@@ -159,7 +170,24 @@ const AddMachine = props => {
   useEffect(() => {
     if (transactionStatus == 'success') setSuccess(true)
     if (transactionStatus == 'failed') setFailed(true)
+
+    if (transactionStatus == 'confirm' || transactionStatus == 'pending') {
+      setloading(true)
+    } else {
+      setloading(false)
+    }
   }, [transactionStatus])
+  
+  useEffect(() => {
+    if (approvestatus == 'confirm') setloading(true)
+    if (approvestatus == 'pending') setFailed(true)
+
+    if (approvestatus == 'confirm' || approvestatus == 'pending') {
+      setloading(true)
+    } else {
+      setloading(false)
+    }
+  }, [approvestatus])
 
   const formatNum = (num, dec = 4) => {
     let x = new BigNumber(num);
@@ -184,10 +212,9 @@ const AddMachine = props => {
       console.log({ cycle, minerNo, orderId: orderid, devId: devId, poolCode, amount: amount_wei, pledgePower, setTransactionStatus })
 
       const tx = await add_machine({ cycle, minerNo, orderId: orderid, devId: devId, poolCode, amount: amount_wei, pledgePower, setTransactionStatus })
-      
-      console.log('tx::', tx)
+      // console.log('tx::', tx)
+
       getMinerInfo(devId)
-      // get_avail_pledage()
 
     } catch (e) {
       setTransactionStatus('fails')
@@ -326,9 +353,9 @@ const AddMachine = props => {
                   Not enough availabel power
                 </Button> :
               (
-                (!poolCode || !minerNo || !devId || !pledgePower  ) ?
+                (!poolCode || !minerNo || !devId || !pledgePower ) ?
                   <Button variant="contained" type="submit" size="large" className={'bottomBox'}>  
-                    Invalid pool code or machine id  
+                    Invalid pool code or machine id
                   </Button>
                   :
                   (
@@ -352,6 +379,7 @@ const AddMachine = props => {
 
         <SuccessModal show={success} handleCloseModal={handleCloseModal} />
         <FailedModal show={failed} handleCloseModal={handleCloseModal} />
+        <LoadingModal show={loading} handleCloseModal={handleCloseLoadingModal} />
       </div>
     </div>
   );
