@@ -545,3 +545,8 @@ a {
   margin: 0px auto;
   max-width: 1260px;
 }
+
+
+.MuiAlert-root {
+  font-size: 0.775rem!important;
+}

@@ -11,6 +11,7 @@ import Alert from '@material-ui/lab/Alert';
 import Collapse from '@material-ui/core/Collapse';
 import CloseIcon from '@material-ui/icons/Close';
 import { Toolbar, Button, IconButton } from '@material-ui/core'
+import Web3Utils from 'web3-utils'
 
 import {
   Home as HomeView,
@@ -66,6 +67,26 @@ const Index = ({ themeMode, tabIndex, ...rest }) => {
     setLoadingend(true)
   }
 
+  const changeNetwork = async () => {
+    await window.ethereum.enable();
+    try {
+      var hex = Web3Utils.toHex('97') // bsc testnet
+      await window.ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: hex }],
+      });
+      // swal("Mainnet", "Swich to Mainnet", "success");
+    } catch (switchError) {
+      if (switchError.code === -32002) {
+        console.log('Already Pending', switchError)
+        // swal("Already Pending", 'Request of type "wallet_switchEthereumChain" already pending, Please wait.', 'error')
+      } else{
+        console.log('Switch Mainnet', switchError)
+        // swal("Error!", 'Switch Mainnet', 'error')
+      }
+    }
+  }
+
   useEffect(() => {
     initweb3()
     getpoolname()
@@ -98,12 +119,13 @@ const Index = ({ themeMode, tabIndex, ...rest }) => {
         <Collapse in={networkID != OKEX_NETWORK_ID} style={{ width: '100%' }} >
           <Alert severity="error"
             action={
-              <IconButton
-                aria-label="close"
-                color="inherit"
-                size="small"
-              >
-              </IconButton>
+              // <IconButton
+              //   aria-label="close"
+              //   color="inherit"
+              //   size="small"
+              // >
+              // </IconButton>
+               <Button color="inherit" size="small" onClick={ changeNetwork }>Change</Button>
             }
           >
             Network Fault, Please change Network

@@ -108,9 +108,9 @@ const dodoBaseUrl = 'https://bsc.api.0x.org/swap/v1/price'
 
 const Index = ({ themeMode }) => {
   const [machinelist, setMachineList] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1)
-  const [loading, setLoading] = useState(null)
-  const [count, setCount] = useState(0)
+  const [currentPage, setCurrentPage] = useState(0)
+  const [loading, setLoading] = useState(true)
+  const [mycount, setCount] = useState(0)
 
   const [pledgeInfo, setPledgeInfo] = useState(
     [
@@ -178,38 +178,54 @@ const Index = ({ themeMode }) => {
 
   const getMoreMachineList = () => {
     setTimeout(async () => {
+      if(mycount == machinelist.length && mycount!= 0) return;
+
       var page = currentPage + 1
+      if (currentPage == 1) { setLoading(true) }
       var url = '/miner/getMinerList'
       var data = {
-        'address': account,
+        'address': account, //'0x87Cc05a792Aadc4a726C8ada71Ab187d02Ae70a7',
         'currentPage': page.toString(),
         'pageSize': pageSize
       }
       const res = await req.post(url, data)
       const { rows, count } = res
-      // var list = []
       var list = []
+ 
       for (let idx = 0; idx < rows.length; idx++) {
         list[idx] = rows[idx]
-        list[idx].amount = rows[idx].amount
         let id = list[idx].serial_number
         let profit = await getProfit(id)
         list[idx].profit = profit
         list[idx].total_profit = profit
       }
 
-      list = machinelist.concat(rows)
+      console.log('loading..' , loading)
+      if (currentPage == 1) {
+        list = rows
+      } else {
+        list = rows.concat(machinelist)
+      }
+      
+      list = machinelist.concat(list)
       console.log('lists:', list)
       setMachineList(list)
       setCurrentPage(page)
+
+        
+      // setMachineList(list)
+      console.log('count:', count , list)
+      setCount(count)
+      setLoading(false)
+      
     }, 100);
   }
 
   const getMachineList = async () => {
     let url = '/miner/getMinerList'
     let data = {
-      'address': account,
-      'currentPage': currentPage.toString(),
+      'address': account, //'0x87Cc05a792Aadc4a726C8ada71Ab187d02Ae70a7',
+      'currentPage': "1".toString(),
       'pageSize': pageSize
     }
     const res = await req.post(url, data)
@@ -223,14 +239,9 @@ const Index = ({ themeMode }) => {
     } else {
       tmp = rows.concat(machinelist)
     }
-    tmp = tmp.map(m => {
-      m.pledge_amount = m.amount
-      return m
-    })
     var list = []
     for (let idx = 0; idx < tmp.length; idx++) {
       list[idx] = tmp[idx]
-      list[idx].amount = tmp[idx].amount
       let id = list[idx].serial_number
       let profit = await getProfit(id)
       list[idx].profit = profit
@@ -292,8 +303,9 @@ const Index = ({ themeMode }) => {
 
   useEffect(() => {
     getPledgeInfo()
-    setCurrentPage(1)
-    getMachineList()
+    setCurrentPage(0)
+    // setCount(0)
+    getMoreMachineList()
   }, [])
 
   const MyCardContent = ({ title, value, unit_desc, class_name }) => {
@@ -332,11 +344,11 @@ const Index = ({ themeMode }) => {
   )
 
   const AdamCard = ({ item, key }) => {
-    console.log('item..', item)
     const {
       total_profit,
       m_no,
-      pledge_amount,
+      amount,
+      // pledge_amount,
       pledge_power,
       create_time
     } = item
@@ -356,7 +368,7 @@ const Index = ({ themeMode }) => {
         <div className='card-body'>
           <div className='card-body-item'>
             <div className='card-body-item-label'>Pledge amount</div>
-            <div className='card-body-item-text'>{formatNum(pledge_amount, 8)} ADAM </div>
+            <div className='card-body-item-text'>{formatNum(amount, 8)} ADAM </div>
           </div>
           <div className='card-body-item'>
             <div className='card-body-item-label'>Pledge computing power</div>
@@ -397,14 +409,14 @@ const Index = ({ themeMode }) => {
       </div>
       {
         loading === true ? <div className={clsx(classes.loadingCls, 'loading')} ><RefreshIcon /></div> :
-          loading === false && machinelist.length == count && count == 0 && currentPage == 1 ? <div className={classes.nodataCls}><NoDataIcon /></div>
+          loading === false && machinelist.length == mycount && mycount == 0 && currentPage == 1 ? <div className={classes.nodataCls}><NoDataIcon /></div>
             : ''
       }
       <InfiniteScroll
         dataLength={machinelist.length}
         next={getMoreMachineList}
         hasMore={true}
-        loader={count != machinelist.length ? <h4 style={{ display: 'flex', justifyContent: 'center' }}>Loading...</h4> : ''}
+        loader={mycount != machinelist.length ? <h4 style={{ display: 'flex', justifyContent: 'center' }}>Loading...</h4> : ''}
       >
         {machinelist.map((item, key) => (
           <AdamCard item={item} key={key} />

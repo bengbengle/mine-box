@@ -95,8 +95,10 @@ const AddMachine = props => {
 
     // total_power：实际空间算力
     // power：剩余可用算力
+    // res.available_power , 用户硬盘可用空间数， 对应用户的总质押空间
+    // res.power , 用户剩余可用质押空间   用户可质押空间 = 用户总质押空间 - 用户已经质押的空间
     const available_power = res && res.power || 0
-    const total_power = res && res.total_power || 0
+    const total_power = res && res.available_power || 0
 
     // minerNo
     {
@@ -350,7 +352,7 @@ const AddMachine = props => {
               : 
               (parseFloat(availabelPower) < parseFloat(pledgePower)) ? 
                 <Button variant="contained" type="submit" size="large" className={'bottomBox'}>  
-                  Not enough availabel power
+                  Not enough available power
                 </Button> :
               (
                 (!poolCode || !minerNo || !devId || !pledgePower ) ?

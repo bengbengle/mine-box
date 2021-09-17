@@ -37,7 +37,7 @@ const MachineDetails = ({location}) => {
 
   console.log('state:', state)
 
-  const { serial_number, pledge_power, m_no, pledge_amount, profit  } = state
+  const { serial_number, pledge_power, m_no, amount, profit  } = state
 
   const getMinerTimes = async () => {
       {
@@ -76,7 +76,7 @@ const MachineDetails = ({location}) => {
             </div>
             <div className='detail-body-up-item'>
               <div className='detail-body-up-item-label'>Current pledge</div>
-              <div className='detail-body-up-item-value'>{ formatNum(pledge_amount, 8) }</div>
+              <div className='detail-body-up-item-value'>{ formatNum(amount, 8) }</div>
               <div className='detail-body-up-item-desc'>ADAM</div>
             </div>
           </div>
