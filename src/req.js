@@ -1,6 +1,8 @@
 import axios from 'axios'
+
 const request= axios.create({
-  baseURL: 'https://mine.adamoracle.io/api/'
+  baseURL: process.env.REACT_APP_BASE_URL 
+  // 'https://mine.adamoracle.io/api/'
   // baseURL: 'http://47.241.183.80:10000/api/'
 })
 

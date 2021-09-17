@@ -3,13 +3,14 @@ import PropTypes from 'prop-types'
 import Web3 from 'web3'
 import { useWeb3React } from '@web3-react/core'
 import contract_abi from './abi/contract.json'
+import contractV2_abi from './abi/contractV2.json'
 import adam_abi from './abi/adam.json'
+ 
+ 
+const version = process.env.REACT_APP_MINER_ADDR
+const miner_address = version == 1 ?  process.env.REACT_APP_MINER_ADDR_V1 : process.env.REACT_APP_MINER_ADDR_V2
 
-// const miner_address = '0xdaFbb2FA0559D7DD17C6400979041cfE3cefE865'
-// const adam_address = '0xD91B0A418Aea5bCc75d6bFD272C31AFE9D7cAa9c'
-
-const miner_address = '0xee2dA6e2d8Ef8e76A44388f517549aE8789498a3'
-const adam_address = '0x3B27116E262C05164FE1dFE7b54f2cc3FbBb4539'
+const adam_address = process.env.REACT_APP_ADAM_ADDR
 
 export const useWallet = () => {
 

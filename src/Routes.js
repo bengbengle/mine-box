@@ -82,6 +82,7 @@ const Index = ({ themeMode, tabIndex, ...rest }) => {
         // swal("Already Pending", 'Request of type "wallet_switchEthereumChain" already pending, Please wait.', 'error')
       } else{
         console.log('Switch Mainnet', switchError)
+        // https://faucet.ropsten.be/donate/WV98W3a7hYhBRIDPRGk8D/0xa8E7813150a988e7F20193983fA3017155F3C162
         // swal("Error!", 'Switch Mainnet', 'error')
       }
     }
