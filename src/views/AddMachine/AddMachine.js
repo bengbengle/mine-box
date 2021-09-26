@@ -76,7 +76,7 @@ const AddMachine = props => {
   const [amount, setAmount] = useState(30)
 
   const [approvestatus, setApprovestatus] = useState('')
-  const [transactionStatus, setTransactionStatus] = useState('') // '' 、confirm 、pengding 、success 、fails  
+  const [txStatus, setTxStatus] = useState('') // '' 、confirm 、pengding 、success 、fails  
 
   const [poolCode, setPoolCode] = useState('')
   const [devId, setDevId] = useState('')
@@ -86,9 +86,12 @@ const AddMachine = props => {
 
   const [pledgePower, setPledgePower] = useState(0)
 
+
+  const [errMsg, setErrMsg] = useState('')
+
   // 获取算力 
   const getMinerInfo = async (id) => {
-    console.log('getMinerInfo', id)
+    // console.log('getMinerInfo', id)
     let url = 'miner/getMinerPledgePower'
     const data = { serialNumber: id }
     const res = await req.post(url, data)
@@ -120,15 +123,15 @@ const AddMachine = props => {
         }
       )
   }
- 
-  
+
+
   const handlePledgeChange = async (val) => {
-    let v = val.replace(/^(0+)|[^\d]+/g,'')
+    let v = val.replace(/^(0+)|[^\d]+/g, '')
     setPledgePower(v)
     let adam_num = parseFloat(v) * 30
     setAmount(adam_num)
 
-    await get_avail_pledage({power: v})
+    await get_avail_pledage({ power: v })
   }
 
   const handleCloseModal = () => {
@@ -140,6 +143,16 @@ const AddMachine = props => {
     setPledgePower(0)
 
   }
+
+  const setTransactionStatus = (status, msg) => {
+    if (status == 'failed') {
+      setErrMsg(msg)
+      setTxStatus(status)
+    } else {
+      setErrMsg('')
+      setTxStatus(status)
+    }
+  }
   const handleCloseLoadingModal = () => {
     // setSuccess(false)
     // setFailed(false)
@@ -148,7 +161,7 @@ const AddMachine = props => {
 
   // device Id changed
   const handleDeviceChanged = async (id) => {
-    console.log('id::', id)
+    // console.log('id::', id)
     setDevId(id)
     getMinerInfo(id)
   }
@@ -158,9 +171,9 @@ const AddMachine = props => {
     setPoolCode(val)
   }
 
-  const get_avail_pledage = async ({power}) => {
-    let val = await availPledage({power})
-    console.log('availPledage::', val)
+  const get_avail_pledage = async ({ power }) => {
+    let val = await availPledage({ power })
+    // console.log('availPledage::', val)
     setForbidden(val)
   }
 
@@ -170,16 +183,16 @@ const AddMachine = props => {
   }, [])
 
   useEffect(() => {
-    if (transactionStatus == 'success') setSuccess(true)
-    if (transactionStatus == 'failed') setFailed(true)
+    if (txStatus == 'success') setSuccess(true)
+    if (txStatus == 'failed') setFailed(true)
 
-    if (transactionStatus == 'confirm' || transactionStatus == 'pending') {
+    if (txStatus == 'confirm' || txStatus == 'pending') {
       setloading(true)
     } else {
       setloading(false)
     }
-  }, [transactionStatus])
-  
+  }, [txStatus])
+
   useEffect(() => {
     if (approvestatus == 'confirm') setloading(true)
     if (approvestatus == 'pending') setFailed(true)
@@ -206,16 +219,39 @@ const AddMachine = props => {
     const cycle = active == 0 ? 360 : active == 1 ? 540 : 1080
     try {
       const orderid = await req.post('miner/getOrderId')
-      console.log('orderid::', orderid)
 
       const web3 = await connectWallet()
       let amount_wei = web3.utils.toWei((amount * 100).toString(), 'mwei')
-      
-      console.log({ cycle, minerNo, orderId: orderid, devId: devId, poolCode, amount: amount_wei, pledgePower, setTransactionStatus })
 
-      const tx = await add_machine({ cycle, minerNo, orderId: orderid, devId: devId, poolCode, amount: amount_wei, pledgePower, setTransactionStatus })
-      // console.log('tx::', tx)
+      const res_status = await add_machine({ cycle, minerNo, orderId: orderid, devId: devId, poolCode, amount: amount_wei, pledgePower, setTransactionStatus })
 
+      console.log('errMsg::', res_status)
+      switch (res_status) {
+        case '1':
+          setErrMsg('Invalid Adam')
+          break;
+        case '2':
+          setErrMsg('Invalid Power')
+          break;
+        case '3':
+          setErrMsg('Invalid Miner Id')
+          break;
+        case '4':
+          setErrMsg('Invalid Miner Code')
+          break;
+        case '5':
+          setErrMsg('Invalid Order Id')
+          break;
+        case '6':
+          setErrMsg('Not Enough Available Power')
+          break;
+        case '7':
+          setErrMsg('Invalid Pledge Period')
+          break;
+        case '8':
+          setErrMsg('Miner Id Occupied') // 矿工ID被占用
+          break;
+      }
       getMinerInfo(devId)
 
     } catch (e) {
@@ -225,7 +261,7 @@ const AddMachine = props => {
   }
   return (
     <div >
-      <div className={clsx('machine-content', classes.machineBody) }>
+      <div className={clsx('machine-content', classes.machineBody)}>
         <Grid container spacing={2}>
           <Grid item xs={12} >
             <Typography
@@ -304,7 +340,7 @@ const AddMachine = props => {
               color="textPrimary"
               className={classes.inputTitle}
             >
-              Pledge 
+              Pledge
             </Typography>
             <span className='subtitle5'>
               (1T Storage Power needs to pledge 30 ADAM)
@@ -323,7 +359,7 @@ const AddMachine = props => {
               }}
             />
             <span className='subtitle5'>
-              Expected pledge { amount } ADAM 
+              Expected pledge {amount} ADAM
             </span>
           </Grid>
           <Grid item xs={12} className='cycle-list'>
@@ -342,45 +378,45 @@ const AddMachine = props => {
               <div className='cycle-item-value'>1080 DAY</div>
             </div>
           </Grid>
-          
+
           <Grid item container xs={12} className='addmachineButton'>
             {
-              forbidden == 1 ?  
-              <Button variant="contained" type="submit" size="large" className={'bottomBox'}>  
-                Number of new spaces waiting to be opened
-              </Button>
-              : 
-              (parseFloat(availabelPower) < parseFloat(pledgePower)) ? 
-                <Button variant="contained" type="submit" size="large" className={'bottomBox'}>  
-                  Not enough available power
-                </Button> :
-              (
-                (!poolCode || !minerNo || !devId || !pledgePower ) ?
-                  <Button variant="contained" type="submit" size="large" className={'bottomBox'}>  
-                    Invalid pool code or machine id
-                  </Button>
-                  :
+              forbidden == 1 ?
+                <Button variant="contained" type="submit" size="large" className={'bottomBox'}>
+                  Number of new spaces waiting to be opened
+                </Button>
+                :
+                (parseFloat(availabelPower) < parseFloat(pledgePower)) ?
+                  <Button variant="contained" type="submit" size="large" className={'bottomBox'}>
+                    Not enough available power
+                  </Button> :
                   (
-                    approvestatus == 'success' ?
-                    (transactionStatus == 'confirm') && <Button  className={'bottomBox'} variant="contained" type="submit" size="large"> Waiting Confirm... </Button>
-                    || (transactionStatus == 'pending') && <Button  className={'bottomBox'} variant="contained" type="submit" size="large"> Pending... </Button>
-                    || (transactionStatus == '') && <Button  className={'bottomBox'} variant="contained" type="submit" color="primary" size="large" onClick={addMachine}>
-                      Staking Now
-                    </Button>
-                    || ''
-                    : (approvestatus == 'confirm') && <Button  className={'bottomBox'} variant="contained" type="submit" size="large"> Waiting Confirm... </Button>
-                    || (approvestatus == 'pending') && <Button  className={'bottomBox'} variant="contained" type="submit" size="large"> pending... </Button>
-                    || <Button className={'bottomBox'} variant="contained" type="submit" size="large" color="primary" onClick={approve} >
-                          {'Approve'}
-                        </Button>
+                    (!poolCode || !minerNo || !devId || !pledgePower) ?
+                      <Button variant="contained" type="submit" size="large" className={'bottomBox'}>
+                        Invalid pool code or machine id
+                      </Button>
+                      :
+                      (
+                        approvestatus == 'success' ?
+                          (txStatus == 'confirm') && <Button className={'bottomBox'} variant="contained" type="submit" size="large"> Waiting Confirm... </Button>
+                          || (txStatus == 'pending') && <Button className={'bottomBox'} variant="contained" type="submit" size="large"> Pending... </Button>
+                          || (txStatus == '') && <Button className={'bottomBox'} variant="contained" type="submit" color="primary" size="large" onClick={addMachine}>
+                            Staking Now
+                          </Button>
+                          || ''
+                          : (approvestatus == 'confirm') && <Button className={'bottomBox'} variant="contained" type="submit" size="large"> Waiting Confirm... </Button>
+                          || (approvestatus == 'pending') && <Button className={'bottomBox'} variant="contained" type="submit" size="large"> pending... </Button>
+                          || <Button className={'bottomBox'} variant="contained" type="submit" size="large" color="primary" onClick={approve} >
+                            {'Approve'}
+                          </Button>
+                      )
                   )
-              )
             }
           </Grid>
         </Grid>
 
         <SuccessModal show={success} handleCloseModal={handleCloseModal} />
-        <FailedModal show={failed} handleCloseModal={handleCloseModal} />
+        <FailedModal show={failed} handleCloseModal={handleCloseModal} errMsg={errMsg} />
         <LoadingModal show={loading} handleCloseModal={handleCloseLoadingModal} />
       </div>
     </div>

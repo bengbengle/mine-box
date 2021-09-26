@@ -2,14 +2,14 @@ import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import Web3 from 'web3'
 import { useWeb3React } from '@web3-react/core'
-import contract_abi from './abi/contract.json'
-import contractV2_abi from './abi/contractV2.json'
+import contract_abi_v1 from './abi/contract.json'
+import contract_abi_v2 from './abi/contractV2.json'
 import adam_abi from './abi/adam.json'
- 
- 
-const version = process.env.REACT_APP_MINER_ADDR
-const miner_address = version == 1 ?  process.env.REACT_APP_MINER_ADDR_V1 : process.env.REACT_APP_MINER_ADDR_V2
 
+const version = process.env.REACT_APP_VERSION
+
+const miner_address = version == 1 ? process.env.REACT_APP_MINER_ADDR_V1 : process.env.REACT_APP_MINER_ADDR_V2
+const contract_abi = version == 1 ? contract_abi_v1 : contract_abi_v2
 const adam_address = process.env.REACT_APP_ADAM_ADDR
 
 export const useWallet = () => {
@@ -38,7 +38,6 @@ export const useWallet = () => {
                         // 本不该执行到这里，但是真到这里了，说明发生了意外
                         console.warn("There was a problem signing you in");
                     }
-                    console.log("ethereum 。error")
                     reject(error)
                 }
             } else if (window.web3) {
@@ -68,7 +67,7 @@ export const useWallet = () => {
     const connect = async () => {
         const web3 = await connectWallet()
         window.web3 = web3
-       
+
         const accounts = await web3.eth.getAccounts()
         const currentAccount = accounts[0]
         setAccount(currentAccount)
@@ -82,9 +81,6 @@ export const useWallet = () => {
 
     const get_contract = async () => {
         const web3 = await connectWallet()
-
-        console.log(web3)
-
         const mine_contract = new web3.eth.Contract(contract_abi, miner_address)
         return mine_contract
     }
@@ -103,14 +99,13 @@ export const useWallet = () => {
             const my_contract = await get_contract()
             const tx = await my_contract.methods.getPoolName()
             const poolname = await tx.call({ from: account })
-            console.log('poolname::', poolname)
             return poolname
         } catch (e) {
             console.log(e)
         }
     }
 
-    const availPledage = async ({power}) => {
+    const availPledage = async ({ power }) => {
         try {
             const my_contract = await get_contract()
             const tx = await my_contract.methods.availPledage(power)
@@ -124,34 +119,51 @@ export const useWallet = () => {
     const add_machine = ({ minerNo, orderId, devId, poolCode, amount, pledgePower, cycle, setTransactionStatus }) => {
         return new Promise(async (resolve, reject) => {
             try {
-                console.log({ minerNo, orderId, devId, poolCode, amount, pledgePower, cycle})
+                console.log({ minerNo, orderId, devId, poolCode, amount, pledgePower, cycle })
                 const my_contract = await get_contract()
-                const add = my_contract.methods.deposit(
+
+                const verif = await my_contract.methods.veriftyeposit(
                     amount,
                     pledgePower,
                     cycle,
-                    orderId,// "D1628750275293B9AEFFBA6AB46CD1",
-                    poolCode, //"p12345678",
-                    devId, // "ec24c456-b7cd-6aa9-eb33-e2cc89b3228c",
-                    minerNo // "M1628750275558C94034F0631E74F3"
+                    orderId,
+                    poolCode, 
+                    devId, 
+                    minerNo 
                 )
+                const verify_code = await verif.call({ from: account })
 
-                console.log('before signed ......')
-                setTransactionStatus('confirm')
-                const tx = add.send({ from: account })
-                tx.on('transactionHash', function (hash) {
-                    console.log('hash::', hash)
-                    setTransactionStatus('pending')
-                   
-                }).on('receipt', function (receipt) {
-                    setTransactionStatus('success')
-
-                }).on('error', error => {
-                    setTransactionStatus('failed')
-                    console.log('tx is failed ......', error)
-                })
-
-                resolve(tx)
+                switch (verify_code) {
+                    case '0': 
+                        const add = my_contract.methods.deposit(
+                            amount,
+                            pledgePower,
+                            cycle,
+                            orderId,
+                            poolCode,
+                            devId,
+                            minerNo
+                        )
+        
+                        console.log('before signed ......')
+                        setTransactionStatus('confirm')
+                        const tx = add.send({ from: account })
+                        tx.on('transactionHash', function (hash) {
+                            console.log('hash::', hash)
+                            setTransactionStatus('pending')
+                        }).on('receipt', function (receipt) {
+                            setTransactionStatus('success')
+                        }).on('error', error => {
+                            setTransactionStatus('failed')
+                            console.log('tx is failed ......', error)
+                        })
+                        resolve(tx)
+                        break;
+                    default:
+                        setTransactionStatus('failed')
+                        resolve(verify_code)
+                        break;
+                }
             } catch (e) {
                 reject(e)
                 console.error(e)
@@ -165,20 +177,20 @@ export const useWallet = () => {
 
                 const adam_contract = await adam_token()
                 const approve = await adam_contract.methods.approve(miner_address, '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff')
-                
+
                 setApprovestatus('confirm')
                 const tx = approve.send({ from: account })
 
                 tx.on('transactionHash', function (hash) {
                     setApprovestatus('pending')
-                   
+
                 }).on('receipt', function (receipt) {
                     setApprovestatus('success')
 
                 }).on('error', error => {
                     setApprovestatus('failed')
                     console.log('tx is failed ......', error)
-                }) 
+                })
 
                 resolve(tx)
             } catch (e) {

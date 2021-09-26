@@ -546,7 +546,11 @@ a {
   max-width: 1260px;
 }
 
-
 .MuiAlert-root {
   font-size: 0.775rem!important;
+}
+
+.MuiDialog-scrollPaper {
+  /* align-items: self-start!important; */
+  /* margin-top: 15%!important; */
 }

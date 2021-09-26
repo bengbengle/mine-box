@@ -16,7 +16,7 @@ const SuccessIcon = () => <img src='/assets/success.png' style={{
     display: 'flex'
  }} />
 
-export default function AlertDialogSlide({ show, handleCloseModal }) {
+export default function AlertDialogSlide({ show, handleCloseModal, errMsg = '' }) {
 
     // console.log('show::', show, 'handleCloseModal:', handleCloseModal)
 
@@ -44,8 +44,10 @@ export default function AlertDialogSlide({ show, handleCloseModal }) {
                 }}>
                     <SuccessIcon />
                     <DialogContentText id="alert-dialog-slide-description" style={{'text-align': 'center' }}>
-                        {/* Congratulations, the withdrawal application is successful */}
                         Add Machine Failed 
+                        {
+                            errMsg && ', ' + errMsg
+                        }
                     </DialogContentText>
                 </DialogContent>
             </Dialog>

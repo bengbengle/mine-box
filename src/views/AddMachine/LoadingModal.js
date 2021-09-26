@@ -13,7 +13,8 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 const useStyles = makeStyles(() => ({
     loadingCls: {
-      width: '100%',
+    //   width: '100%',
+      margin: '10px 70px',
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center'
