@@ -141,7 +141,7 @@ const Index = ({ themeMode }) => {
 
   const classes = useStyles();
   const history = useHistory();
-  const { account } = useWallet()
+  const { account, get_total_powers, get_total_amounts} = useWallet()
 
   const clickAddMachine = () => history.push('/addmachine')
 
@@ -221,64 +221,31 @@ const Index = ({ themeMode }) => {
     }, 100);
   }
 
-  const getMachineList = async () => {
-    let url = '/miner/getMinerList'
-    let data = {
-      'address': account, //'0x87Cc05a792Aadc4a726C8ada71Ab187d02Ae70a7',
-      'currentPage': "1".toString(),
-      'pageSize': pageSize
-    }
-    const res = await req.post(url, data)
-    console.log('res::', res)
-
-    const { rows, count } = res
-    let tmp = []
-    if (currentPage == 1) {
-      setLoading(true)
-      tmp = rows
-    } else {
-      tmp = rows.concat(machinelist)
-    }
-    var list = []
-    for (let idx = 0; idx < tmp.length; idx++) {
-      list[idx] = tmp[idx]
-      let id = list[idx].serial_number
-      let profit = await getProfit(id)
-      list[idx].profit = profit
-      list[idx].total_profit = profit
-    }
-    console.log('list:', list)
-
-    setMachineList(list)
-    setCount(count)
-    setLoading(false)
-  }
-
   // 质押信息
   const getPledgeInfo = async () => {
 
-    const url1 = '/profit/getUserProfit'
-    const res1 = await req.post(url1, { address: account })
+    // const url1 = '/profit/getUserProfit'
+    // const res1 = await req.post(url1, { address: account })
 
-    const url2 = '/miner/getUserPledge'
-    const res2 = await req.post(url2, { address: account })
+    // const url2 = '/miner/getUserPledge'
+    // const res2 = await req.post(url2, { address: account })
 
 
-    const all_profit = res1 && res1.all_profit || 0
-    const all_pledge = res2 && res2.all_pledge || 0
+    // const all_profit = res1 && res1.all_profit || 0
+    // const all_pledge = res2 && res2.all_pledge || 0
 
-    let tmp = [
-      {
-        title: 'Total network power',
-        value: formatNum(all_pledge),
-        unit_desc: 'T'
-      }, {
-        title: 'Total network profit',
-        value: formatNum(all_profit),
-        unit_desc: 'ADAM'
-      }
-    ]
-    setPledgeInfo(tmp)
+    // let tmp = [
+    //   {
+    //     title: 'Total network power',
+    //     value: formatNum(all_pledge),
+    //     unit_desc: 'T'
+    //   }, {
+    //     title: 'Total network profit',
+    //     value: formatNum(all_profit),
+    //     unit_desc: 'ADAM'
+    //   }
+    // ]
+    // setPledgeInfo(tmp)
 
 
 
@@ -300,12 +267,34 @@ const Index = ({ themeMode }) => {
 
     setPriceInfo(price_info)
   }
+  
+  const  get_total_network_info = async() => {
 
+    let s1 =  await get_total_powers() || '0'
+    let s2 = await get_total_amounts() || '0'
+    
+    console.log('s1:', s1, 's2:', s2)
+
+    let tmp = [
+      {
+        title: 'Total network power',
+        value: formatNum(s1),
+        unit_desc: 'T'
+      }, {
+        title: 'Total network profit',
+        value: formatNum(s2, 8),
+        unit_desc: 'ADAM'
+      }
+    ]
+    setPledgeInfo(tmp)
+  }
+  
   useEffect(() => {
     getPledgeInfo()
-    setCurrentPage(0)
-    // setCount(0)
+    setCurrentPage(0) 
     getMoreMachineList()
+
+    get_total_network_info()
   }, [])
 
   const MyCardContent = ({ title, value, unit_desc, class_name }) => {
@@ -343,12 +332,11 @@ const Index = ({ themeMode }) => {
     </Card>
   )
 
-  const AdamCard = ({ item, key }) => {
+  const AdamCard = ({ item }) => {
     const {
       total_profit,
       m_no,
       amount,
-      // pledge_amount,
       pledge_power,
       create_time
     } = item

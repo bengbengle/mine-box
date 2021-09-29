@@ -21,15 +21,7 @@ import { withStyles } from '@material-ui/core/styles'
 const useStyles = makeStyles(() => ({
   fontWeight900: {
     fontWeight: 900,
-  },
-  // cardBox: {
-  //   minWidth: 275,
-  //   background: '#303030',
-  //   margin: '0.8rem auto',
-  //   maxWidth: '1236px',
-  //   display: 'flex',
-  //   width: '95%'
-  // },
+  }, 
   bullet: {
     display: 'inline-block',
     margin: '0 2px',
@@ -57,9 +49,7 @@ const useStyles = makeStyles(() => ({
     lineHeight: '45px'
   },
 }))
-
-const HelpIcon = props => <img src='/assets/help.png' style={{ width: '1rem', height: '1rem' }} />
-
+ 
 const legendStyles = () => ({
   root: {
     display: 'flex',
@@ -73,6 +63,7 @@ const legendLabelStyles = theme => ({
     whiteSpace: 'nowrap',
   },
 })
+
 const legendItemStyles = () => ({
   item: {
     flexDirection: 'row',
@@ -94,41 +85,15 @@ const Label = withStyles(legendLabelStyles, { name: 'LegendLabel' })(legendLabel
 const Item = withStyles(legendItemStyles, { name: 'LegendItem' })(legendItemBase)
 
 
-const CardItem = ({ classes, title, value, unit_desc, has_help }) => {
-
-
-  const [open, setOpen] = React.useState(false);
-
-  const handleTooltipClose = () => {
-    setOpen(false);
-  };
-  const handleTooltipOpen = () => {
-    setOpen(true);
-  };
-
+const CardItem = ({ classes, title, value, unit_desc, is_number }) => {
+ 
   return <div style={{ width: '50%' }}>
     <CardContent className={classes.cardContent}>
       <Typography className={classes.title} color="textSecondary" gutterBottom>
         {title}
-        {has_help &&
-          <ClickAwayListener onClickAway={handleTooltipClose}>
-            <Tooltip
-              title={title}
-              onClose={handleTooltipClose}
-              open={open}
-              disableFocusListener
-              disableHoverListener
-              disableTouchListener
-              placement="bottom">
-              <IconButton onClick={handleTooltipOpen} style={{ padding: '10px!important' }}>
-                {/* <HelpIcon /> */}
-              </IconButton>
-            </Tooltip>
-          </ClickAwayListener>
-        }
       </Typography>
       <Typography className={classes.value} variant="h5" component="h2">
-        <CountUp start={0} end={value} duration="1" decimal='.' decimals={4} separator=',' useGrouping="true" />
+        {!is_number ? value :  <CountUp start={0} end={value} duration="1" decimal='.' decimals={4} separator=',' useGrouping="true" />}
       </Typography>
       <Typography className={classes.unit_desc} color="textSecondary" >
         {unit_desc}
@@ -137,35 +102,16 @@ const CardItem = ({ classes, title, value, unit_desc, has_help }) => {
   </div>
 }
 
-// const CardList = ({ classes, list }) => (
-//   <Card className='cardBox' >
-//     {
-//       list.map(({ title, value, unit_desc, has_help }, key) => (
-//         <CardItem
-//           key={key}
-//           title={title}
-//           value={value}
-//           classes={classes}
-//           has_help={has_help}
-//           unit_desc={unit_desc}>
-//         </CardItem>
-//       ))
-//     }
-//   </Card>
-// )
 
 const Index = () => {
-
   const classes = useStyles()
   const history = useHistory()
-  const { account, get_pledgeinfo } = useWallet()
+  const { account, get_pledgeinfo, get_userinfo } = useWallet()
 
   const [total_pledge_adam, set_total_pledge_adam] = useState(0); // 总质押 adam
   const [total_pledge_power, set_total_pledge_power] = useState(0); // 总质押 算力
-
-  const [total_pledge_withdraw, set_total_pledge_withdraw] = useState(0); // 总质押算力
  
-  const [expired_power, set_expired_power] = useState(0); // 已到期 算力
+  const [expired_machine_number, set_expired_machine_number] = useState(0); // 已到期 算力
   const [extracted_adam, set_extracted_adam] = useState(0); // 已提取 算力
 
   const [chart_data, set_chart_data] = useState([
@@ -181,7 +127,7 @@ const Index = () => {
     set_total_pledge_adam(res && res.total_adam || 0) // 总质押 adam
     set_total_pledge_power(res && res.total_pledge || 0) // 总质押 power
 
-    set_expired_power(res && res.total_date || 0) // 已到期
+    // set_expired_machine_number(res && res.total_date || 0) // 已到期
     set_extracted_adam(res && res.total_draw || 0) // 已提取
 
     let all_pledge = res && res.all_pledge || 1
@@ -201,13 +147,41 @@ const Index = () => {
   }
 
   const clickWithdrawButton = props => {
-    history.push('/unstaking')
+    // history.push('/unstaking')
+    history.push('/stakinglist')
   }
  
+  const getExpiredMachineLength = async () => {
+    var url = '/miner/getOrderList'
+    var data = {
+        'address': account,
+        'currentPage': '1',
+        'pageSize': '0'
+    }
+    const res = await req.post(url, data)
+    const { count } = res
+    set_expired_machine_number(count || 0) // 已到期
+
+    let userinfo = await get_userinfo()
+    console.log('userinfo', userinfo) 
+    let { drawAdam, drawPower, amount } = userinfo
+    
+    // amount: "3000000000"    // 质押adam 
+    // cycle: "360"
+    // devId: "vir-0000"
+    // drawAdam: "0"       / 已提取 adam 
+    // drawPower: "0"      / 已提取算力 
+    console.log('length::', count)
+  
+  }
+
   const colors = ["#EF0A0A", "#FF6B22"]
   
   useEffect(() => {
     getMyStakingInfo(account)
+
+    getExpiredMachineLength()
+  
   }, [])
 
   return (
@@ -215,10 +189,10 @@ const Index = () => {
       <Card className='cardBox' >
         <CardItem
           key={0}
-          title={'Pledge Power'}
-          value={formatNum(total_pledge_power) }
+          title={'Pledge power'}
+          value={total_pledge_power }
           classes={classes}
-          has_help={true}
+          is_number={true}
           unit_desc={'T'}>
         </CardItem>
         <CardItem
@@ -226,26 +200,26 @@ const Index = () => {
           title={'Total pledge'}
           value={formatNum(total_pledge_adam, 8)}
           classes={classes}
-          has_help={true}
+          is_number={true}
           unit_desc={'ADAM'}>
         </CardItem>
       </Card>
       <Card className='cardBox' >
         <CardItem
           key={0}
-          title={'Expired space'}
-          value={formatNum(expired_power)}
+          title={''}
+          value={expired_machine_number}
           classes={classes}
-          has_help={true}
-          unit_desc={'T'}>
+          is_number={false}
+          unit_desc={'Expired machines number'}>
         </CardItem>
         <CardItem
           key={1}
-          title={'Extracted'}
+          title={''}
           value={formatNum(extracted_adam, 8)}
           classes={classes}
-          has_help={true}
-          unit_desc={'ADAM'}>
+          is_number={true}
+          unit_desc={'Extracted(ADAM)'}>
         </CardItem>
       </Card>
 

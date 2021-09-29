@@ -88,7 +88,7 @@ export default function Index({ show, handleCloseModal }) {
                     alignItems: 'center'
                 }}>
                     <DialogTitle id="form-dialog-title">
-                        Set Pool Name
+                        Set Nickname
                     </DialogTitle>
                     <TextField
                         value={poolName}

@@ -94,12 +94,36 @@ export const useWallet = () => {
             console.log(e)
         }
     }
+
     const get_pool_name = async () => {
         try {
             const my_contract = await get_contract()
             const tx = await my_contract.methods.getPoolName()
             const poolname = await tx.call({ from: account })
             return poolname
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
+    
+    const get_withdraw = async ({orderId}) => {
+        try {
+            const my_contract = await get_contract()
+            const tx = await my_contract.methods.getWithdraw(orderId)
+            const res = await tx.call({ from: account })
+            return res
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
+    const get_userOrderInfo = async({orderId}) => {
+        try {
+            const my_contract = await get_contract()
+            const tx = await my_contract.methods.userOrderInfo(orderId, account)
+            const res = await tx.call({ from: account })
+            return res
         } catch (e) {
             console.log(e)
         }
@@ -171,6 +195,33 @@ export const useWallet = () => {
         })
     }
 
+    const send_withdraw = ({orderId, setwithdrawstatus}) => {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const my_contract = await get_contract()
+
+                setwithdrawstatus('confirm')
+                const req = await my_contract.methods.withdraw(orderId)
+                const tx = await req.send({ from: account })
+                tx.on('transactionHash', function (hash) {
+                    console.log('hash::', hash)
+                    setwithdrawstatus('pending')
+                }).on('receipt', function (receipt) {
+                    setwithdrawstatus('success')
+                }).on('error', error => {
+                    setwithdrawstatus('failed')
+                    console.log('tx is failed ......', error)
+                })
+                resolve(tx)
+
+            } catch (e) {
+
+                setwithdrawstatus('failed')
+
+                reject(e)
+            }
+        })
+    }
     const approval = async ({ setApprovestatus }) => {
         return new Promise(async (resolve, reject) => {
             try {
@@ -212,6 +263,36 @@ export const useWallet = () => {
         const allowance = await approve.call({ from: account })
         return allowance
     }
+    const get_userinfo = async () => {
+        try {
+            const my_contract = await get_contract()
+            const tx = await my_contract.methods.userInfo(account)
+            const userinfo = await tx.call({ from: account })
+            return userinfo
+        } catch (e) {
+            console.log(e)
+        }
+    }
+    const get_total_powers = async () => {
+        try {
+            const my_contract = await get_contract()
+            const tx = await my_contract.methods.totalPowers()
+            const res = await tx.call({ from: account })
+            return res
+        } catch (e) {
+            console.log(e)
+        }
+    }
+    const get_total_amounts = async () => {
+        try {
+            const my_contract = await get_contract()
+            const tx = await my_contract.methods.totalAmounts()
+            const res = await tx.call({ from: account })
+            return res
+        } catch (e) {
+            console.log(e)
+        }
+    }
 
     return {
         account,
@@ -225,6 +306,12 @@ export const useWallet = () => {
         get_pool_name,
         add_machine,
         approval,
-        get_allowance
+        get_allowance,
+        get_withdraw,
+        get_userOrderInfo,
+        send_withdraw,
+        get_userinfo,
+        get_total_powers,
+        get_total_amounts
     }
 }

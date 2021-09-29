@@ -243,7 +243,7 @@ const AddMachine = props => {
           setErrMsg('Invalid Order Id')
           break;
         case '6':
-          setErrMsg('Not Enough Available Power')
+          setErrMsg('Not Enough Available Power') // 这一期 总质押 空间不足
           break;
         case '7':
           setErrMsg('Invalid Pledge Period')
@@ -251,6 +251,9 @@ const AddMachine = props => {
         case '8':
           setErrMsg('Miner Id Occupied') // 矿工ID被占用
           break;
+        case '9':
+            setErrMsg('Not Enough Miner Available Power') //  旷工机器的矿机空间不足
+            break;
       }
       getMinerInfo(devId)
 

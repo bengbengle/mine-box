@@ -10,3 +10,4 @@ export { default as MyEarnings } from './MyEarnings';
 export { default as MyStaking } from './MyStaking';
 export { default as Withdraw } from './Withdraw';
 export { default as UnStaking } from './UnStaking';
+export { default as StakingList } from './StakingList';

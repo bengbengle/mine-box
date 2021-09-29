@@ -22,7 +22,8 @@ import {
   MyEarnings,
   MyStaking,
   Withdraw,
-  UnStaking
+  UnStaking,
+  StakingList
 } from './views';
 
 import ProfileModal from './components/ProfileModal'
@@ -244,18 +245,8 @@ const Routes = () => {
           />
         )}
       />
-      <Route
-        exact
-        path="/unstaking"
-        render={props => (
-          <WithLayout
-            {...props}
-            component={UnStaking}
-            layout={MainLayout}
-          />
-        )}
-      />
-
+      <Route path="/stakinglist" render={props => <WithLayout {...props} component={StakingList} layout={MainLayout} /> } />
+      <Route path="/unstaking" render={props => <WithLayout {...props} component={UnStaking} layout={MainLayout} /> } />
       <Redirect to="/" />
     </Router>
   );

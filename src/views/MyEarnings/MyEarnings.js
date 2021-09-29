@@ -167,7 +167,7 @@ const Index = ({ themeMode }) => {
           {title}
         </Typography>
         <Typography className={classes.value} variant="h5" component="h2">
-          {unit_desc == 'Number of miners' ? value : <CountUp start={0} end={value} duration="1" decimal='.' decimals={4} separator=',' useGrouping="true" />}
+           <CountUp start={0} end={value} duration="1" decimal='.' decimals={4} separator=',' useGrouping="true" />
         </Typography>
         <Typography className={classes.unit_desc} color="textSecondary" >
           {unit_desc}
