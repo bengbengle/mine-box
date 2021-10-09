@@ -195,7 +195,7 @@ const AddMachine = props => {
 
   useEffect(() => {
     if (approvestatus == 'confirm') setloading(true)
-    if (approvestatus == 'pending') setFailed(true)
+    if (approvestatus == 'failed') setFailed(true)
 
     if (approvestatus == 'confirm' || approvestatus == 'pending') {
       setloading(true)
@@ -253,6 +253,9 @@ const AddMachine = props => {
           break;
         case '9':
             setErrMsg('Not Enough Miner Available Power') //  旷工机器的矿机空间不足
+            break;
+        case '10':
+            setErrMsg("The Pledge power and Adam'number not match ") // 质押的 算力 和 ADAM 数不匹配
             break;
       }
       getMinerInfo(devId)

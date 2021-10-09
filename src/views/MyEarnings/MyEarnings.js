@@ -105,12 +105,18 @@ const Index = ({ themeMode }) => {
 
   const classes = useStyles();
 
-  const { account, get_pledgeinfo } = useWallet()
+  const { account, get_pledgeinfo, get_draw_profit, get_user_profit_info, get_total_profit } = useWallet()
 
-  const formatNum = (num, dec = 4) => {
+  // const formatNum = (num, dec = 4) => {
+  //   let x = new BigNumber(num);
+  //   let x_str = x.toFixed(dec);
+  //   return x_str
+  // }
+  const formatNum = (num, precision = 0, dec = 4) => {
     let x = new BigNumber(num);
-    let x_str = x.toFixed(dec);
-    return x_str
+    let x_div = x.dividedBy(10 ** precision)
+    let x_fixed = x_div.toFixed(dec);
+    return x_fixed
   }
 
   const getMyEarnInfo = async (address) => {
@@ -143,17 +149,18 @@ const Index = ({ themeMode }) => {
 
   const list = [{
     title: 'Total revenue',
-    value: formatNum(totalProfit),
+    value: formatNum(totalProfit, 8),
     unit_desc: 'ADAM'
   }, {
     title: 'Total Release',
-    value: formatNum(totalRelease),
+    value: formatNum(totalRelease, 8),
     unit_desc: 'ADAM'
   }]
   const list2 = [{
     title: '',
-    value: formatNum(totalLock),
-    unit_desc: 'Locked(ADAM)'
+    value: formatNum(totalLock, 8),
+    unit_desc: 'Locked(ADAM)',
+    
   }, {
     title: '',
     value: minertimes,
@@ -167,7 +174,10 @@ const Index = ({ themeMode }) => {
           {title}
         </Typography>
         <Typography className={classes.value} variant="h5" component="h2">
-           <CountUp start={0} end={value} duration="1" decimal='.' decimals={4} separator=',' useGrouping="true" />
+           {
+             unit_desc == 'Number of miners' ? value :
+             <CountUp start={0} end={value} duration="1" decimal='.' decimals={4} separator=',' useGrouping="true" />
+           }
         </Typography>
         <Typography className={classes.unit_desc} color="textSecondary" >
           {unit_desc}
@@ -175,6 +185,7 @@ const Index = ({ themeMode }) => {
       </CardContent>
     </div>
   }
+
   const CardList = ({ list }) => (
 
     <Card className='cardBox' >
@@ -196,8 +207,55 @@ const Index = ({ themeMode }) => {
     history.push('/withdraw')
   }
 
+  const getAccountInfo = async () => {
+    // get_draw_profit()
+    // .then(res=>{
+    //   console.log('profit:' , res)
+    // })
+    const total_profit = await get_total_profit()
+
+    const res = await get_user_profit_info()
+    
+    let profit = res[0]
+    let release = res[1]
+    let lock = res[2]
+    let release_xssf = res[3]
+    
+    // let total_profit = res[0]
+    console.log('user profit:' , res)
+
+
+    let big_release = new BigNumber(release);
+    let big_release_xssf = new BigNumber(release_xssf);
+    let total_release = big_release.plus(big_release)
+    setTotalRelease(total_release || 0)
+    setTotalProfit(profit || 0)
+    setTotalLock(lock || 0)
+
+
+    
+    const url2 = '/miner/getMinerNumber'
+    const res2 = await req.post(url2, { address: account })
+
+    setMinerTimes(res2 && res2 || 0)
+
+
+    setChartData([
+      { category: "Whole network profit", val: formatNum(total_profit, 8) },
+      { category: "My profit", val: formatNum(profit, 8) }
+    ])
+    
+    // .then(res => {
+    // console.log(res)
+    // })
+  }
   useEffect(() => {
-    getMyEarnInfo(account)
+    // getMyEarnInfo(account)
+
+    getAccountInfo()
+      
+    
+    // , send_draw_profit, get_user_profit_info
   }, [])
 
   return (
@@ -218,11 +276,7 @@ const Index = ({ themeMode }) => {
         }  className={classes.chartTitle} />
           <Palette scheme={chart_scheme} />
           <PieSeries innerRadius={0.5} outerRadius={0.7} valueField="val" argumentField="category" />
-          {/* <EventTracker onClick={clickTooltip} />
-          <Legend position="bottom" rootComponent={Root} itemComponent={Item} labelComponent={Label} /> */}
-          
           <EventTracker />
-          {/* <Tooltip /> */}
         </Chart>
       </Card>
       <Card className={'bottomBox'} >

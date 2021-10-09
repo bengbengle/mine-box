@@ -10,6 +10,16 @@
 				"internalType": "contract IERC20",
 				"name": "_adamToken",
 				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "__minerLockContract",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "_minerPoolContract",
+				"type": "address"
 			}
 		],
 		"stateMutability": "nonpayable",
@@ -86,6 +96,25 @@
 			}
 		],
 		"name": "Deposit",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			}
+		],
+		"name": "DrawProfit",
 		"type": "event"
 	},
 	{
@@ -181,41 +210,28 @@
 		"name": "basicInfo",
 		"outputs": [
 			{
-				"internalType": "string",
+				"internalType": "uint256",
 				"name": "totalPower",
-				"type": "string"
+				"type": "uint256"
 			},
-			{
-				"internalType": "string",
-				"name": "adamNum",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "rate",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "qAmount",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "totalAmount",
-				"type": "string"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "decimal",
-		"outputs": [
 			{
 				"internalType": "uint256",
-				"name": "",
+				"name": "adamNum",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "rate",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "qAmount",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "totalAmount",
 				"type": "uint256"
 			}
 		],
@@ -277,26 +293,6 @@
 		"outputs": [
 			{
 				"internalType": "uint256",
-				"name": "diskSize",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "availableDisk",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "sysMemory",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "flag",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
 				"name": "amount",
 				"type": "uint256"
 			},
@@ -329,6 +325,13 @@
 		"type": "function"
 	},
 	{
+		"inputs": [],
+		"name": "drawProfit",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
 		"inputs": [
 			{
 				"internalType": "uint256",
@@ -355,14 +358,8 @@
 		"type": "function"
 	},
 	{
-		"inputs": [
-			{
-				"internalType": "string",
-				"name": "_orderId",
-				"type": "string"
-			}
-		],
-		"name": "getOrderId",
+		"inputs": [],
+		"name": "getDrawProfit",
 		"outputs": [
 			{
 				"internalType": "uint256",
@@ -377,11 +374,11 @@
 		"inputs": [
 			{
 				"internalType": "string",
-				"name": "_poolCode",
+				"name": "_orderId",
 				"type": "string"
 			}
 		],
-		"name": "getPoolCode",
+		"name": "getOrderId",
 		"outputs": [
 			{
 				"internalType": "uint256",
@@ -489,25 +486,6 @@
 		"type": "function"
 	},
 	{
-		"inputs": [
-			{
-				"internalType": "string",
-				"name": "",
-				"type": "string"
-			}
-		],
-		"name": "poolCodes",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
 		"inputs": [],
 		"name": "renounceOwnership",
 		"outputs": [],
@@ -523,39 +501,6 @@
 			}
 		],
 		"name": "setDeployAddress",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "string",
-				"name": "_devId",
-				"type": "string"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_value",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_diskSize",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_availableDisk",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_sysMemory",
-				"type": "uint256"
-			}
-		],
-		"name": "setDevId",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -586,50 +531,32 @@
 				"type": "uint256"
 			},
 			{
-				"internalType": "string",
+				"internalType": "uint256",
 				"name": "_totalPower",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "_adamNum",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "_rate",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "_qAmount",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "_totalAmount",
-				"type": "string"
-			}
-		],
-		"name": "setPledgeInfo",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "string",
-				"name": "_poolCode",
-				"type": "string"
+				"type": "uint256"
 			},
 			{
 				"internalType": "uint256",
-				"name": "_value",
+				"name": "_adamNum",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_rate",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_qAmount",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_totalAmount",
 				"type": "uint256"
 			}
 		],
-		"name": "setPoolCode",
+		"name": "setPledgeInfo",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -701,6 +628,19 @@
 	},
 	{
 		"inputs": [],
+		"name": "totalLock",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
 		"name": "totalPledge",
 		"outputs": [
 			{
@@ -715,6 +655,45 @@
 	{
 		"inputs": [],
 		"name": "totalPowers",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "totalProfit",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "totalRelease",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "totalReleaseXssf",
 		"outputs": [
 			{
 				"internalType": "uint256",
@@ -741,6 +720,62 @@
 	{
 		"inputs": [
 			{
+				"internalType": "address[]",
+				"name": "_userInfo",
+				"type": "address[]"
+			},
+			{
+				"internalType": "uint256[]",
+				"name": "_profitInfo",
+				"type": "uint256[]"
+			},
+			{
+				"internalType": "uint256[]",
+				"name": "_releaseInfo",
+				"type": "uint256[]"
+			},
+			{
+				"internalType": "uint256[]",
+				"name": "_lockInfo",
+				"type": "uint256[]"
+			}
+		],
+		"name": "updateProfit",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_user",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_profit",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_release",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_lock",
+				"type": "uint256"
+			}
+		],
+		"name": "updateProfit1",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
 				"internalType": "address",
 				"name": "",
 				"type": "address"
@@ -750,7 +785,7 @@
 		"outputs": [
 			{
 				"internalType": "uint256",
-				"name": "amount", 
+				"name": "amount",
 				"type": "uint256"
 			},
 			{
@@ -776,7 +811,7 @@
 			{
 				"internalType": "uint256",
 				"name": "drawAdam",
-				"type": "uint256" 
+				"type": "uint256"
 			},
 			{
 				"internalType": "uint256",
@@ -876,6 +911,45 @@
 				"internalType": "string",
 				"name": "minerNo",
 				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"name": "userProfitInfo",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "profit",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "release",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "lock",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "release_xssf",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "drawProfit",
+				"type": "uint256"
 			}
 		],
 		"stateMutability": "view",

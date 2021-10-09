@@ -8,6 +8,8 @@ import CountUp from "react-countup";
 
 import IAlert from '../../components/IAlert'
 
+import LoadingModal from '../AddMachine/LoadingModal'
+
 const useStyles = makeStyles(theme => ({
     icon: {
         background: 'transparent',
@@ -64,45 +66,51 @@ const useStyles = makeStyles(theme => ({
 
 const Index = () => {
     const classes = useStyles()
-    const { shortAccount, account } = useWallet()
+    const { shortAccount, account, get_draw_profit, send_draw_profit } = useWallet()
     const [extractableAmount, setExtractableAmount] = useState(0)
     const [openAlert, setopenAlert] = React.useState(false);
-    const [status, setStatus] = React.useState('success');
+    const [status, setStatus] = React.useState('');
+    const [drawstatus, setdrawstatus] = React.useState('');
+    const [loading, setloading] = useState(false)
 
     const withdrawAll = async (address) => {
-        try {
-            const url = '/profit/drawProfit'
-            const res = await req.post(url, { address: address })
-            console.log('res::', res)
-            setStatus('success')
-            setopenAlert(true)
-            
-            setTimeout(() => {
-                getExtractableAmount(address)
-            }, 800)
-            
-        } catch(ex) {
-            setStatus('error')
-            setopenAlert(true)
-        }
+        let res = await send_draw_profit({setdrawstatus})
+        init()
+        console.log('withdraw ::::', res)
     }
 
-    const formatNum = (num, dec = 4) => {
+    const formatNum = (num, precision = 0, dec = 4) => {
         let x = new BigNumber(num);
-        let x_str = x.toFixed(dec);
-        return x_str
+        let x_div = x.dividedBy(10 ** precision)
+        let x_fixed = x_div.toFixed(dec);
+        return x_fixed
     }
-    const getExtractableAmount = async (address) => {
-        const url = '/profit/getDrawSendProfit'
-        const res = await req.post(url, { address: address })
-        const amount = res && res.amount || 0
-        console.log('res::', res)
-        setExtractableAmount(amount)
+    const init = async () => {
+        let res = await get_draw_profit()
+        console.log('get ::::', res)
+        setExtractableAmount(formatNum(res, 8))
     }
 
     useEffect(() => {
-        getExtractableAmount(account)
+        init()
     }, [])
+
+
+    useEffect(() => {
+        if (drawstatus == 'confirm') setloading(true)
+        if (drawstatus == 'confirm' || drawstatus == 'pending') {
+          setloading(true)
+        } else if (drawstatus == 'success') {
+            setloading(false)
+            // setStatus()
+            setStatus('success')
+            setopenAlert(true)
+        } else if (drawstatus == 'failed') {
+            setloading(false)
+            setStatus('error')
+            setopenAlert(true)
+        }
+      }, [drawstatus])
 
     return (
         <div data-aos='fade-up' className='root-content'>
@@ -113,7 +121,6 @@ const Index = () => {
                     <Grid item xs={12} className={classes.margin20}>
                         <div className='staking-box' >
                             <div className='number'>
-                                {/* {formatNum(extractableAmount) || '0.0000' } */}
                                 <CountUp start={0} end={extractableAmount} duration="1" decimal='.' decimals={4} separator=',' useGrouping="true" />
                             </div>
                             <div className='desc'>
@@ -127,7 +134,7 @@ const Index = () => {
                         please pay attention to check it
                     </div>
                     <Grid item container >
-                        {extractableAmount ? <Button
+                        {extractableAmount!=0.0000 ? <Button
                             onClick={e => withdrawAll(account)}
                             fullWidth
                             variant="contained"
@@ -135,12 +142,16 @@ const Index = () => {
                             color="primary"
                             size="large"
                             className='bottomBox'
-                        > Withdraw </Button> :
-                            <Button fullWidth variant="contained" type="submit" size="large" className='bottomBox'> Withdraw </Button>
+                        > Withdraw {extractableAmount}</Button> :
+                            <Button fullWidth variant="contained" type="submit" size="large" className='bottomBox'> 
+                                Withdraw
+                                {/* {{extractableAmount}} */}
+                            </Button>
                         }
                     </Grid>
                 </Grid>
             </div>
+            <LoadingModal show={loading} handleCloseModal={()=>{}} />
         </div>
     )
 }

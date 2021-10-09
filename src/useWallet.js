@@ -195,28 +195,28 @@ export const useWallet = () => {
         })
     }
 
-    const send_withdraw = ({orderId, setwithdrawstatus}) => {
+    const send_withdraw = ({orderId, setdrawstatus}) => {
         return new Promise(async (resolve, reject) => {
             try {
                 const my_contract = await get_contract()
 
-                setwithdrawstatus('confirm')
+                setdrawstatus('confirm')
                 const req = await my_contract.methods.withdraw(orderId)
-                const tx = await req.send({ from: account })
+                const tx = req.send({ from: account })
                 tx.on('transactionHash', function (hash) {
                     console.log('hash::', hash)
-                    setwithdrawstatus('pending')
+                    setdrawstatus('pending')
                 }).on('receipt', function (receipt) {
-                    setwithdrawstatus('success')
+                    setdrawstatus('success')
                 }).on('error', error => {
-                    setwithdrawstatus('failed')
+                    setdrawstatus('failed')
                     console.log('tx is failed ......', error)
                 })
                 resolve(tx)
 
             } catch (e) {
 
-                setwithdrawstatus('failed')
+                setdrawstatus('failed')
 
                 reject(e)
             }
@@ -294,6 +294,70 @@ export const useWallet = () => {
         }
     }
 
+    const get_draw_profit = async () => {
+        try {
+            const my_contract = await get_contract()
+            const tx = await my_contract.methods.getDrawProfit()
+            const res = await tx.call({ from: account })
+            return res
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
+    const send_draw_profit = async ({ setdrawstatus }) => {
+        
+        return new Promise(async (resolve, reject) => {
+            try {
+
+                const my_contract = await get_contract()
+                const req = await my_contract.methods.drawProfit()
+
+                setdrawstatus('confirm')
+                const tx = req.send({ from: account })
+
+                tx.on('transactionHash', function (hash) {
+                    setdrawstatus('pending')
+
+                }).on('receipt', function (receipt) {
+                    setdrawstatus('success')
+
+                }).on('error', error => {
+                    setdrawstatus('failed')
+                    console.log('tx is failed ......', error)
+                })
+
+                resolve(tx)
+                
+            } catch (e) {
+                reject(e)
+                console.error(e)
+            }
+        })
+    }
+    
+    const get_user_profit_info = async () => {
+        try {
+            const my_contract = await get_contract()
+            const tx = await my_contract.methods.userProfitInfo(account)
+            const res = await tx.call({ from: account })
+            return res
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
+    const get_total_profit = async () => {
+        try {
+            const my_contract = await get_contract()
+            const tx = await my_contract.methods.totalProfit(account)
+            const res = await tx.call({ from: account })
+            return res
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
     return {
         account,
         setAccount,
@@ -312,6 +376,10 @@ export const useWallet = () => {
         send_withdraw,
         get_userinfo,
         get_total_powers,
-        get_total_amounts
+        get_total_amounts,
+        get_draw_profit,
+        send_draw_profit,
+        get_user_profit_info,
+        get_total_profit
     }
 }

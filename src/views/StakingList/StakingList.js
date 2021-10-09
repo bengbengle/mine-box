@@ -7,6 +7,9 @@ import { request as req } from '../../req'
 import { useWallet } from '../../useWallet'
 import BigNumber from "bignumber.js";
 
+
+import LoadingModal from '../AddMachine/LoadingModal'
+
 const useStyles = makeStyles(() => ({
     fontWeight900: {
         fontWeight: 900,
@@ -108,6 +111,11 @@ const Index = ({ }) => {
 
     const { get_withdraw, send_withdraw, get_userOrderInfo, get_total_powers, get_total_amounts, get_userinfo } = useWallet()
 
+    const [status, setStatus] = React.useState('');
+    const [drawstatus, setdrawstatus] = React.useState('');
+
+    const [drawloading, setdrawLoading] = useState(false)
+
     const classes = useStyles();
     const { account } = useWallet()
 
@@ -187,9 +195,10 @@ const Index = ({ }) => {
     
     const withdraw = async (orderId) => {
         // send_withdraw
-        let name = await send_withdraw({ orderId,  setwithdrawstatus})
-        // setPoolName(name)
-        console.log('poolname:', name)
+        let name = await send_withdraw({ orderId,  setdrawstatus})
+        setCurrentPage(0)
+        await getMoreMachineList()
+
     }
 
     const testfunc = async() => {
@@ -211,6 +220,19 @@ const Index = ({ }) => {
         testfunc()
     }, [])
 
+    useEffect(() => {
+        if (drawstatus == 'confirm') setdrawLoading(true)
+        if (drawstatus == 'confirm' || drawstatus == 'pending') {
+            setdrawLoading(true)
+        } else if (drawstatus == 'success') {
+            setdrawLoading(false)
+            setStatus('success')
+        } else if (drawstatus == 'failed') {
+            setdrawLoading(false)
+            setStatus('error')
+        }
+      }, [drawstatus])
+
     const AdamCard = ({ item }) => {
         
         const {
@@ -226,6 +248,7 @@ const Index = ({ }) => {
 
         return (
             <div className='adam-card'  style={{ cursor: 'default' }} >
+                 {/* <IAlert show={openAlert} setOpenAlert={setopenAlert} status={status} /> */}
                 <div className='card-header'>
                     <div className='header-icon'>
                         <MachineIcon />
@@ -239,7 +262,7 @@ const Index = ({ }) => {
                                 withdraw(order_id)
                             }  else { 
                                 console.log('withdrawable 0')
-                                withdraw(order_id)
+                                // withdraw(order_id)
                             }
                         }}
                         variant="contained"
@@ -287,6 +310,7 @@ const Index = ({ }) => {
             >
                 {machinelist.map((item, key) => <AdamCard item={item} key={key} />)}
             </InfiniteScroll>
+            <LoadingModal show={drawloading} handleCloseModal={()=>{}} />
         </div>
     );
 }
