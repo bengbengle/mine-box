@@ -350,7 +350,7 @@ export const useWallet = () => {
     const get_total_profit = async () => {
         try {
             const my_contract = await get_contract()
-            const tx = await my_contract.methods.totalProfit(account)
+            const tx = await my_contract.methods.totalProfit()
             const res = await tx.call({ from: account })
             return res
         } catch (e) {

@@ -225,9 +225,12 @@ const Index = ({ themeMode }) => {
     console.log('user profit:' , res)
 
 
+    console.log('release:', release, 'release_xssf::', release_xssf)
     let big_release = new BigNumber(release);
     let big_release_xssf = new BigNumber(release_xssf);
-    let total_release = big_release.plus(big_release)
+
+    let total_release = big_release.plus(big_release_xssf)
+    
     setTotalRelease(total_release || 0)
     setTotalProfit(profit || 0)
     setTotalLock(lock || 0)
